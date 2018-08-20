@@ -1,0 +1,7 @@
+*
+!*/
+!*.*
+*.swp
+*.orig
+workspace.xml
+.idea
