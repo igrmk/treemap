@@ -61,6 +61,7 @@ TreeMap uses O(N) memory.
 Get or update
 
 ```bash
+go get github.com/ncw/gotemplate/...
 go get github.com/igrmk/treemap
 ```
 
