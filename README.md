@@ -66,7 +66,7 @@ go get github.com/igrmk/treemap
 
 ### Licensing
 
-Copyright &copy; 2018 Igor Mikushkin %lt;igor.mikushkin@gmail.com%gt;
+Copyright &copy; 2018 Igor Mikushkin &lt;igor.mikushkin@gmail.com&gt;
 This work is free. You can redistribute it and/or modify it under the
 terms of the Do What The Fuck You Want To Public License, Version 2,
 as published by Sam Hocevar. See the LICENSE file for more details.
