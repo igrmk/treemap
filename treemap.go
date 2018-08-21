@@ -197,7 +197,7 @@ func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 	}
 }
 
-// UpperBound returns an iterator such that it goes thought all the keys in the range (key, max(key)] by analogy with C++.
+// UpperBound returns an iterator such that it goes through all the keys in the range (key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *TreeMap) UpperBound(key Key) ForwardIterator {
 	node := t.root
