@@ -30,6 +30,10 @@ This is gotemplate ready package.
 You can use it as a template to generate TreeMap with specific Key and Value types.
 
 Generating TreeMap with int keys and string values
+	package main
+
+	import "fmt"
+
 	//go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
 
 	func less(x int, y int) bool { return x < y }
@@ -193,7 +197,7 @@ func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 	}
 }
 
-// UpperBound returns an iterator such that it goes thought all the keys in the range (key, max(key)] by analogy with C++.
+// UpperBound returns an iterator such that it goes through all the keys in the range (key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
 	nodeIntStringTreeMap := t.root
