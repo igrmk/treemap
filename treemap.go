@@ -28,6 +28,10 @@ This is gotemplate ready package.
 You can use it as a template to generate TreeMap with specific Key and Value types.
 
 Generating TreeMap with int keys and string values
+	package main
+
+	import "fmt"
+
 	//go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
 
 	func less(x int, y int) bool { return x < y }
