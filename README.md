@@ -11,7 +11,7 @@ Generic `TreeMap` uses red-black tree under the hood.
 This is gotemplate ready package.
 You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
 See example folder for generating `TreeMap<int, string>`.
-The package is based on github.com/logrusorgru/ebony due to outstanding test coverage.
+The package is based on https://github.com/logrusorgru/ebony due to outstanding test coverage.
 It is not thread safe.
 
 ### Usage
