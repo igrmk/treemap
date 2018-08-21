@@ -3,7 +3,7 @@ TreeMap
 
 [![GoDoc](https://godoc.org/github.com/igrmk/treemap?status.svg)](https://godoc.org/github.com/igrmk/treemap)
 [![WTFPL License](https://img.shields.io/badge/license-wtfpl-blue.svg)](http://www.wtfpl.net/about/)
-[![Build Status](https://travis-ci.org/igrmk/treemap.svg)](https://travis-ci.org/igrmk/treemap)
+[![Build Status](https://travis-ci.org/igrmk/treemap.svg?branch=master)](https://travis-ci.org/igrmk/treemap)
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
 [![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
 
