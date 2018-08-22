@@ -52,10 +52,6 @@ It is not thread safe.
 */
 package main
 
-import (
-	"runtime"
-)
-
 type colorIntStringTreeMap bool
 
 const (
@@ -139,7 +135,6 @@ func (t *intStringTreeMap) Count() int {
 func (t *intStringTreeMap) Clear() *intStringTreeMap {
 	t.root = sentinelIntStringTreeMap
 	t.count = 0
-	runtime.GC()
 	return t
 }
 

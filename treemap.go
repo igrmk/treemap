@@ -50,10 +50,6 @@ It is not thread safe.
 */
 package treemap
 
-import (
-	"runtime"
-)
-
 type color bool
 
 const (
@@ -139,7 +135,6 @@ func (t *TreeMap) Count() int {
 func (t *TreeMap) Clear() *TreeMap {
 	t.root = sentinel
 	t.count = 0
-	runtime.GC()
 	return t
 }
 
