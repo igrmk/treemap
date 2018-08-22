@@ -70,15 +70,15 @@ const (
 // Value is a generic value type of the map
 
 type nodeIntStringTreeMap struct {
-	left                  *nodeIntStringTreeMap
-	right                 *nodeIntStringTreeMap
-	parent                *nodeIntStringTreeMap
-	colorIntStringTreeMap colorIntStringTreeMap
-	key                   int
-	value                 string
+	left   *nodeIntStringTreeMap
+	right  *nodeIntStringTreeMap
+	parent *nodeIntStringTreeMap
+	color  colorIntStringTreeMap
+	key    int
+	value  string
 }
 
-var sentinelIntStringTreeMap = &nodeIntStringTreeMap{left: nil, right: nil, parent: nil, colorIntStringTreeMap: blackIntStringTreeMap}
+var sentinelIntStringTreeMap = &nodeIntStringTreeMap{left: nil, right: nil, parent: nil, color: blackIntStringTreeMap}
 
 func init() {
 	sentinelIntStringTreeMap.left, sentinelIntStringTreeMap.right = sentinelIntStringTreeMap, sentinelIntStringTreeMap
@@ -168,7 +168,7 @@ func (t *intStringTreeMap) Min() (int, string) {
 func (t *intStringTreeMap) Range(from, to int) forwardIteratorIntStringTreeMap {
 	lower := t.LowerBound(from)
 	upper := t.UpperBound(to)
-	return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: lower.nodeIntStringTreeMap, end: upper.nodeIntStringTreeMap}
+	return forwardIteratorIntStringTreeMap{tree: t, node: lower.node, end: upper.node}
 }
 
 // LowerBound returns an iterator such that it goes through all the keys in the range [key, max(key)] by analogy with C++.
@@ -177,21 +177,21 @@ func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 	nodeIntStringTreeMap := t.root
 	result := sentinelIntStringTreeMap
 	if nodeIntStringTreeMap == sentinelIntStringTreeMap {
-		return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
+		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
 		if t.less(nodeIntStringTreeMap.key, key) {
 			if nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
 				nodeIntStringTreeMap = nodeIntStringTreeMap.right
 			} else {
-				return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: result, end: sentinelIntStringTreeMap}
+				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		} else {
 			result = nodeIntStringTreeMap
 			if nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
 				nodeIntStringTreeMap = nodeIntStringTreeMap.left
 			} else {
-				return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: result, end: sentinelIntStringTreeMap}
+				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		}
 	}
@@ -203,21 +203,21 @@ func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
 	nodeIntStringTreeMap := t.root
 	result := sentinelIntStringTreeMap
 	if nodeIntStringTreeMap == sentinelIntStringTreeMap {
-		return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
+		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
 		if !t.less(key, nodeIntStringTreeMap.key) {
 			if nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
 				nodeIntStringTreeMap = nodeIntStringTreeMap.right
 			} else {
-				return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: result, end: sentinelIntStringTreeMap}
+				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		} else {
 			result = nodeIntStringTreeMap
 			if nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
 				nodeIntStringTreeMap = nodeIntStringTreeMap.left
 			} else {
-				return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: result, end: sentinelIntStringTreeMap}
+				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		}
 	}
@@ -231,7 +231,7 @@ func (t *intStringTreeMap) Iterator() forwardIteratorIntStringTreeMap {
 	for nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
 		nodeIntStringTreeMap = nodeIntStringTreeMap.left
 	}
-	return forwardIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
+	return forwardIteratorIntStringTreeMap{tree: t, node: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
 }
 
 // Reverse returns a reverse iterator for tree map.
@@ -242,7 +242,7 @@ func (t *intStringTreeMap) Reverse() reverseIteratorIntStringTreeMap {
 	for nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
 		nodeIntStringTreeMap = nodeIntStringTreeMap.right
 	}
-	return reverseIteratorIntStringTreeMap{tree: t, nodeIntStringTreeMap: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
+	return reverseIteratorIntStringTreeMap{tree: t, node: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
 }
 
 func (t *intStringTreeMap) rotateLeft(x *nodeIntStringTreeMap) {
@@ -294,42 +294,42 @@ func (t *intStringTreeMap) rotateRight(x *nodeIntStringTreeMap) {
 }
 
 func (t *intStringTreeMap) insertFixup(x *nodeIntStringTreeMap) {
-	for x != t.root && x.parent.colorIntStringTreeMap == redIntStringTreeMap {
+	for x != t.root && x.parent.color == redIntStringTreeMap {
 		if x.parent == x.parent.parent.left {
 			y := x.parent.parent.right
-			if y.colorIntStringTreeMap == redIntStringTreeMap {
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				y.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.parent.colorIntStringTreeMap = redIntStringTreeMap
+			if y.color == redIntStringTreeMap {
+				x.parent.color = blackIntStringTreeMap
+				y.color = blackIntStringTreeMap
+				x.parent.parent.color = redIntStringTreeMap
 				x = x.parent.parent
 			} else {
 				if x == x.parent.right {
 					x = x.parent
 					t.rotateLeft(x)
 				}
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.parent.colorIntStringTreeMap = redIntStringTreeMap
+				x.parent.color = blackIntStringTreeMap
+				x.parent.parent.color = redIntStringTreeMap
 				t.rotateRight(x.parent.parent)
 			}
 		} else {
 			y := x.parent.parent.left
-			if y.colorIntStringTreeMap == redIntStringTreeMap {
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				y.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.parent.colorIntStringTreeMap = redIntStringTreeMap
+			if y.color == redIntStringTreeMap {
+				x.parent.color = blackIntStringTreeMap
+				y.color = blackIntStringTreeMap
+				x.parent.parent.color = redIntStringTreeMap
 				x = x.parent.parent
 			} else {
 				if x == x.parent.left {
 					x = x.parent
 					t.rotateRight(x)
 				}
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.parent.colorIntStringTreeMap = redIntStringTreeMap
+				x.parent.color = blackIntStringTreeMap
+				x.parent.parent.color = redIntStringTreeMap
 				t.rotateLeft(x.parent.parent)
 			}
 		}
 	}
-	t.root.colorIntStringTreeMap = blackIntStringTreeMap
+	t.root.color = blackIntStringTreeMap
 }
 
 func (t *intStringTreeMap) insertNode(id int, value string) {
@@ -352,8 +352,8 @@ func (t *intStringTreeMap) insertNode(id int, value string) {
 		parent: parent,
 		left:   sentinelIntStringTreeMap,
 		right:  sentinelIntStringTreeMap,
-		colorIntStringTreeMap: redIntStringTreeMap,
-		key: id,
+		color:  redIntStringTreeMap,
+		key:    id,
 	}
 	if parent != nil {
 		if t.less(id, parent.key) {
@@ -370,58 +370,58 @@ func (t *intStringTreeMap) insertNode(id int, value string) {
 
 // nolint: gocyclo
 func (t *intStringTreeMap) deleteFixup(x *nodeIntStringTreeMap) {
-	for x != t.root && x.colorIntStringTreeMap == blackIntStringTreeMap {
+	for x != t.root && x.color == blackIntStringTreeMap {
 		if x == x.parent.left {
 			w := x.parent.right
-			if w.colorIntStringTreeMap == redIntStringTreeMap {
-				w.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.colorIntStringTreeMap = redIntStringTreeMap
+			if w.color == redIntStringTreeMap {
+				w.color = blackIntStringTreeMap
+				x.parent.color = redIntStringTreeMap
 				t.rotateLeft(x.parent)
 				w = x.parent.right
 			}
-			if w.left.colorIntStringTreeMap == blackIntStringTreeMap && w.right.colorIntStringTreeMap == blackIntStringTreeMap {
-				w.colorIntStringTreeMap = redIntStringTreeMap
+			if w.left.color == blackIntStringTreeMap && w.right.color == blackIntStringTreeMap {
+				w.color = redIntStringTreeMap
 				x = x.parent
 			} else {
-				if w.right.colorIntStringTreeMap == blackIntStringTreeMap {
-					w.left.colorIntStringTreeMap = blackIntStringTreeMap
-					w.colorIntStringTreeMap = redIntStringTreeMap
+				if w.right.color == blackIntStringTreeMap {
+					w.left.color = blackIntStringTreeMap
+					w.color = redIntStringTreeMap
 					t.rotateRight(w)
 					w = x.parent.right
 				}
-				w.colorIntStringTreeMap = x.parent.colorIntStringTreeMap
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				w.right.colorIntStringTreeMap = blackIntStringTreeMap
+				w.color = x.parent.color
+				x.parent.color = blackIntStringTreeMap
+				w.right.color = blackIntStringTreeMap
 				t.rotateLeft(x.parent)
 				x = t.root
 			}
 		} else {
 			w := x.parent.left
-			if w.colorIntStringTreeMap == redIntStringTreeMap {
-				w.colorIntStringTreeMap = blackIntStringTreeMap
-				x.parent.colorIntStringTreeMap = redIntStringTreeMap
+			if w.color == redIntStringTreeMap {
+				w.color = blackIntStringTreeMap
+				x.parent.color = redIntStringTreeMap
 				t.rotateRight(x.parent)
 				w = x.parent.left
 			}
-			if w.right.colorIntStringTreeMap == blackIntStringTreeMap && w.left.colorIntStringTreeMap == blackIntStringTreeMap {
-				w.colorIntStringTreeMap = redIntStringTreeMap
+			if w.right.color == blackIntStringTreeMap && w.left.color == blackIntStringTreeMap {
+				w.color = redIntStringTreeMap
 				x = x.parent
 			} else {
-				if w.left.colorIntStringTreeMap == blackIntStringTreeMap {
-					w.right.colorIntStringTreeMap = blackIntStringTreeMap
-					w.colorIntStringTreeMap = redIntStringTreeMap
+				if w.left.color == blackIntStringTreeMap {
+					w.right.color = blackIntStringTreeMap
+					w.color = redIntStringTreeMap
 					t.rotateLeft(w)
 					w = x.parent.left
 				}
-				w.colorIntStringTreeMap = x.parent.colorIntStringTreeMap
-				x.parent.colorIntStringTreeMap = blackIntStringTreeMap
-				w.left.colorIntStringTreeMap = blackIntStringTreeMap
+				w.color = x.parent.color
+				x.parent.color = blackIntStringTreeMap
+				w.left.color = blackIntStringTreeMap
 				t.rotateRight(x.parent)
 				x = t.root
 			}
 		}
 	}
-	x.colorIntStringTreeMap = blackIntStringTreeMap
+	x.color = blackIntStringTreeMap
 }
 
 // nolint: gocyclo
@@ -457,7 +457,7 @@ func (t *intStringTreeMap) deleteNode(z *nodeIntStringTreeMap) {
 		z.key = y.key
 		z.value = y.value
 	}
-	if y.colorIntStringTreeMap == blackIntStringTreeMap {
+	if y.color == blackIntStringTreeMap {
 		t.deleteFixup(x)
 	}
 	t.count--
@@ -481,68 +481,68 @@ func (t *intStringTreeMap) findNode(id int) *nodeIntStringTreeMap {
 // ForwardIterator represents a position in a tree map.
 // It starts at the one-before-the start position and goes to the end.
 type forwardIteratorIntStringTreeMap struct {
-	tree                 *intStringTreeMap
-	nodeIntStringTreeMap *nodeIntStringTreeMap
-	end                  *nodeIntStringTreeMap
+	tree *intStringTreeMap
+	node *nodeIntStringTreeMap
+	end  *nodeIntStringTreeMap
 }
 
 // HasNext reports if we have elements after current position
-func (i forwardIteratorIntStringTreeMap) HasNext() bool { return i.nodeIntStringTreeMap != i.end }
+func (i forwardIteratorIntStringTreeMap) HasNext() bool { return i.node != i.end }
 
 // Next returns next element from a tree map.
 // It panics if goes out of bounds.
 func (i *forwardIteratorIntStringTreeMap) Next() (key int, value string) {
-	if i.nodeIntStringTreeMap == i.end {
+	if i.node == i.end {
 		panic("out of bound iteration")
 	}
-	key, value = i.nodeIntStringTreeMap.key, i.nodeIntStringTreeMap.value
-	if i.nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
-		i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.right
-		for i.nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
-			i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.left
+	key, value = i.node.key, i.node.value
+	if i.node.right != sentinelIntStringTreeMap {
+		i.node = i.node.right
+		for i.node.left != sentinelIntStringTreeMap {
+			i.node = i.node.left
 		}
 		return
 	}
-	for i.nodeIntStringTreeMap.parent != nil {
-		i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.parent
-		if !i.tree.less(i.nodeIntStringTreeMap.key, key) {
+	for i.node.parent != nil {
+		i.node = i.node.parent
+		if !i.tree.less(i.node.key, key) {
 			return
 		}
 	}
-	i.nodeIntStringTreeMap = i.end
+	i.node = i.end
 	return
 }
 
 // ReverseIterator represents a position in a tree map.
 // It starts at the one-past-the-end position and goes to the beginning.
 type reverseIteratorIntStringTreeMap struct {
-	tree                 *intStringTreeMap
-	nodeIntStringTreeMap *nodeIntStringTreeMap
-	end                  *nodeIntStringTreeMap
+	tree *intStringTreeMap
+	node *nodeIntStringTreeMap
+	end  *nodeIntStringTreeMap
 }
 
 // HasNext reports if we have elements after current position
-func (i reverseIteratorIntStringTreeMap) HasNext() bool { return i.nodeIntStringTreeMap != i.end }
+func (i reverseIteratorIntStringTreeMap) HasNext() bool { return i.node != i.end }
 
 // Next returns next element from a tree map
 func (i *reverseIteratorIntStringTreeMap) Next() (key int, value string) {
-	if i.nodeIntStringTreeMap == i.end {
+	if i.node == i.end {
 		panic("out of bound iteration")
 	}
-	key, value = i.nodeIntStringTreeMap.key, i.nodeIntStringTreeMap.value
-	if i.nodeIntStringTreeMap.left != i.end {
-		i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.left
-		for i.nodeIntStringTreeMap.right != i.end {
-			i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.right
+	key, value = i.node.key, i.node.value
+	if i.node.left != i.end {
+		i.node = i.node.left
+		for i.node.right != i.end {
+			i.node = i.node.right
 		}
 		return
 	}
-	for i.nodeIntStringTreeMap.parent != nil {
-		i.nodeIntStringTreeMap = i.nodeIntStringTreeMap.parent
-		if !i.tree.less(key, i.nodeIntStringTreeMap.key) {
+	for i.node.parent != nil {
+		i.node = i.node.parent
+		if !i.tree.less(key, i.node.key) {
 			return
 		}
 	}
-	i.nodeIntStringTreeMap = i.end
+	i.node = i.end
 	return
 }
