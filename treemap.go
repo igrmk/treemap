@@ -499,10 +499,12 @@ func (i *ForwardIterator) Next() (key Key, value Value) {
 		return
 	}
 	for i.node.parent != nil {
-		i.node = i.node.parent
-		if !i.tree.less(i.node.key, key) {
+		parent := i.node.parent
+		if parent.left == i.node {
+			i.node = i.node.parent
 			return
 		}
+		i.node = i.node.parent
 	}
 	i.node = i.end
 	return
@@ -533,10 +535,12 @@ func (i *ReverseIterator) Next() (key Key, value Value) {
 		return
 	}
 	for i.node.parent != nil {
-		i.node = i.node.parent
-		if !i.tree.less(key, i.node.key) {
+		parent := i.node.parent
+		if parent.right == i.node {
+			i.node = i.node.parent
 			return
 		}
+		i.node = i.node.parent
 	}
 	i.node = i.end
 	return
