@@ -8,10 +8,11 @@ TreeMap
 [![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
 
 Generic `TreeMap` uses red-black tree under the hood.
-This is gotemplate ready package.
+This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
 You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
 See example folder for generating `TreeMap<int, string>`.
-The package is based on https://github.com/logrusorgru/ebony due to outstanding test coverage.
+The package is based on [ebony](https://github.com/logrusorgru/ebony) due to outstanding test coverage.
+Iterators are designed after Java. This design works well in Go.
 It is not thread safe.
 
 ### Usage
@@ -37,6 +38,22 @@ func main() {
 }
 ```
 
+To build it you need to run
+
+```bash
+go generate
+go build
+```
+
+### Install
+
+Get or update
+
+```bash
+go get github.com/ncw/gotemplate/...
+go get github.com/igrmk/treemap
+```
+
 ### Complexity
 
 | Name        | Time      |
@@ -55,15 +72,6 @@ func main() {
 ### Memory usage
 
 TreeMap uses O(N) memory.
-
-### Install
-
-Get or update
-
-```bash
-go get github.com/ncw/gotemplate/...
-go get github.com/igrmk/treemap
-```
 
 ### Licensing
 
