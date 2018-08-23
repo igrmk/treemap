@@ -501,10 +501,10 @@ func (i *ForwardIterator) Next() (key Key, value Value) {
 	for i.node.parent != nil {
 		parent := i.node.parent
 		if parent.left == i.node {
-			i.node = i.node.parent
+			i.node = parent
 			return
 		}
-		i.node = i.node.parent
+		i.node = parent
 	}
 	i.node = i.end
 	return
@@ -537,10 +537,10 @@ func (i *ReverseIterator) Next() (key Key, value Value) {
 	for i.node.parent != nil {
 		parent := i.node.parent
 		if parent.right == i.node {
-			i.node = i.node.parent
+			i.node = parent
 			return
 		}
-		i.node = i.node.parent
+		i.node = parent
 	}
 	i.node = i.end
 	return
