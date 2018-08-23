@@ -111,11 +111,11 @@ func (t *intStringTreeMap) Del(id int) {
 // Get retrieves a value from a map for specified key and reports if it exists.
 // Complexity: O(log N).
 func (t *intStringTreeMap) Get(id int) (string, bool) {
-	nodeIntStringTreeMap := t.findNode(id)
-	if nodeIntStringTreeMap == sentinelIntStringTreeMap {
-		return nodeIntStringTreeMap.value, false
+	node := t.findNode(id)
+	if node == sentinelIntStringTreeMap {
+		return node.value, false
 	}
-	return nodeIntStringTreeMap.value, true
+	return node.value, true
 }
 
 // Contains checks if key exists in a map.
@@ -169,22 +169,22 @@ func (t *intStringTreeMap) Range(from, to int) forwardIteratorIntStringTreeMap {
 // LowerBound returns an iterator such that it goes through all the keys in the range [key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
-	nodeIntStringTreeMap := t.root
+	node := t.root
 	result := sentinelIntStringTreeMap
-	if nodeIntStringTreeMap == sentinelIntStringTreeMap {
+	if node == sentinelIntStringTreeMap {
 		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
-		if t.less(nodeIntStringTreeMap.key, key) {
-			if nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
-				nodeIntStringTreeMap = nodeIntStringTreeMap.right
+		if t.less(node.key, key) {
+			if node.right != sentinelIntStringTreeMap {
+				node = node.right
 			} else {
 				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		} else {
-			result = nodeIntStringTreeMap
-			if nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
-				nodeIntStringTreeMap = nodeIntStringTreeMap.left
+			result = node
+			if node.left != sentinelIntStringTreeMap {
+				node = node.left
 			} else {
 				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
@@ -195,22 +195,22 @@ func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 // UpperBound returns an iterator such that it goes through all the keys in the range (key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
-	nodeIntStringTreeMap := t.root
+	node := t.root
 	result := sentinelIntStringTreeMap
-	if nodeIntStringTreeMap == sentinelIntStringTreeMap {
+	if node == sentinelIntStringTreeMap {
 		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
-		if !t.less(key, nodeIntStringTreeMap.key) {
-			if nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
-				nodeIntStringTreeMap = nodeIntStringTreeMap.right
+		if !t.less(key, node.key) {
+			if node.right != sentinelIntStringTreeMap {
+				node = node.right
 			} else {
 				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
 		} else {
-			result = nodeIntStringTreeMap
-			if nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
-				nodeIntStringTreeMap = nodeIntStringTreeMap.left
+			result = node
+			if node.left != sentinelIntStringTreeMap {
+				node = node.left
 			} else {
 				return forwardIteratorIntStringTreeMap{tree: t, node: result, end: sentinelIntStringTreeMap}
 			}
@@ -222,22 +222,22 @@ func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
 // It starts at the one-before-the-start position and goes to the end.
 // You can iterate a map at O(N) complexity.
 func (t *intStringTreeMap) Iterator() forwardIteratorIntStringTreeMap {
-	nodeIntStringTreeMap := t.root
-	for nodeIntStringTreeMap.left != sentinelIntStringTreeMap {
-		nodeIntStringTreeMap = nodeIntStringTreeMap.left
+	node := t.root
+	for node.left != sentinelIntStringTreeMap {
+		node = node.left
 	}
-	return forwardIteratorIntStringTreeMap{tree: t, node: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
+	return forwardIteratorIntStringTreeMap{tree: t, node: node, end: sentinelIntStringTreeMap}
 }
 
 // Reverse returns a reverse iterator for tree map.
 // It starts at the one-past-the-end position and goes to the beginning.
 // You can iterate a map at O(N) complexity.
 func (t *intStringTreeMap) Reverse() reverseIteratorIntStringTreeMap {
-	nodeIntStringTreeMap := t.root
-	for nodeIntStringTreeMap.right != sentinelIntStringTreeMap {
-		nodeIntStringTreeMap = nodeIntStringTreeMap.right
+	node := t.root
+	for node.right != sentinelIntStringTreeMap {
+		node = node.right
 	}
-	return reverseIteratorIntStringTreeMap{tree: t, node: nodeIntStringTreeMap, end: sentinelIntStringTreeMap}
+	return reverseIteratorIntStringTreeMap{tree: t, node: node, end: sentinelIntStringTreeMap}
 }
 
 func (t *intStringTreeMap) rotateLeft(x *nodeIntStringTreeMap) {
@@ -501,10 +501,10 @@ func (i *forwardIteratorIntStringTreeMap) Next() (key int, value string) {
 	for i.node.parent != nil {
 		parent := i.node.parent
 		if parent.left == i.node {
-			i.node = i.node.parent
+			i.node = parent
 			return
 		}
-		i.node = i.node.parent
+		i.node = parent
 	}
 	i.node = i.end
 	return
@@ -537,10 +537,10 @@ func (i *reverseIteratorIntStringTreeMap) Next() (key int, value string) {
 	for i.node.parent != nil {
 		parent := i.node.parent
 		if parent.right == i.node {
-			i.node = i.node.parent
+			i.node = parent
 			return
 		}
-		i.node = i.node.parent
+		i.node = parent
 	}
 	i.node = i.end
 	return
