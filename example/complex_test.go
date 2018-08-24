@@ -31,15 +31,15 @@ import (
 	"testing"
 )
 
-const COUNT = 10000
-const RMAX = 20000
+const MapSize = 10000
+const RandMax = 20000
 
 func TestRandomSetGetDel(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	kv := make(map[int]string)
-	for i := 0; i < COUNT; i++ {
-		k := int(rand.Int63n(RMAX))
-		v := value(strconv.Itoa(int(rand.Int63n(RMAX))))
+	for i := 0; i < MapSize; i++ {
+		k := int(rand.Int63n(RandMax))
+		v := value(strconv.Itoa(int(rand.Int63n(RandMax))))
 		tr.Set(k, v)
 		kv[k] = v
 		if len(kv) != tr.Count() {
@@ -62,9 +62,9 @@ func TestRandomSetGetDel(t *testing.T) {
 func TestRandomSetIter(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	kv := make(map[int]string)
-	for i := 0; i < COUNT; i++ {
-		k := int(rand.Int63n(RMAX))
-		v := value(strconv.Itoa(int(rand.Int63n(RMAX))))
+	for i := 0; i < MapSize; i++ {
+		k := int(rand.Int63n(RandMax))
+		v := value(strconv.Itoa(int(rand.Int63n(RandMax))))
 		tr.Set(k, v)
 		kv[k] = v
 		if len(kv) != tr.Count() {

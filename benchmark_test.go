@@ -30,8 +30,6 @@ import (
 	"testing"
 )
 
-const MapSize = 10000
-
 func BenchmarkSeqSet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		tr := New(less)
