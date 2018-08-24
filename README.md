@@ -77,7 +77,7 @@ go get github.com/igrmk/treemap
 
 ### Memory usage
 
-TreeMap uses O(N) memory.
+TreeMap uses O(*N*) memory.
 
 ### Licensing
 
