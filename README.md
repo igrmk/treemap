@@ -48,6 +48,9 @@ go generate
 go build
 ```
 
+Command `go generate` will generate a file `gotemplate_intStringTreeMap.go` in the same directory.
+This file will contain ready to use tree map.
+
 ### Install
 
 Get or update
