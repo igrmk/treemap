@@ -331,7 +331,7 @@ func (t *intStringTreeMap) insertNode(id int, value string) {
 	current := t.root
 	var parent *nodeIntStringTreeMap
 	for current != sentinelIntStringTreeMap {
-		if id == current.key {
+		if !t.Less(id, current.key) && !t.Less(current.key, id) {
 			current.value = value
 			return
 		}
@@ -461,7 +461,7 @@ func (t *intStringTreeMap) deleteNode(z *nodeIntStringTreeMap) {
 func (t *intStringTreeMap) findNode(id int) *nodeIntStringTreeMap {
 	current := t.root
 	for current != sentinelIntStringTreeMap {
-		if id == current.key {
+		if !t.Less(id, current.key) && !t.Less(current.key, id) {
 			return current
 		}
 		if t.Less(id, current.key) {

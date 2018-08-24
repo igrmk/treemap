@@ -331,7 +331,7 @@ func (t *TreeMap) insertNode(id Key, value Value) {
 	current := t.root
 	var parent *node
 	for current != sentinel {
-		if id == current.key {
+		if !t.Less(id, current.key) && !t.Less(current.key, id) {
 			current.value = value
 			return
 		}
@@ -461,7 +461,7 @@ func (t *TreeMap) deleteNode(z *node) {
 func (t *TreeMap) findNode(id Key) *node {
 	current := t.root
 	for current != sentinel {
-		if id == current.key {
+		if !t.Less(id, current.key) && !t.Less(current.key, id) {
 			return current
 		}
 		if t.Less(id, current.key) {
