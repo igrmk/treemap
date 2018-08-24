@@ -7,6 +7,9 @@ TreeMap
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
 [![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
 
+Warning: currently gotemplate has some issues that prevent usage of this library. They should be fixed soon.
+Meanwhile you can use my version of it https://github.com/igrmk/gotemplate with fixes included.
+
 Generic `TreeMap` uses red-black tree under the hood.
 This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
 You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
