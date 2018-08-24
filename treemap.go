@@ -84,7 +84,7 @@ func init() {
 type TreeMap struct {
 	root  *node
 	count int
-	less  func(Key, Key) bool
+	Less  func(Key, Key) bool
 }
 
 // New creates the new red-black tree based TreeMap.
@@ -92,7 +92,7 @@ type TreeMap struct {
 func New(less func(a Key, b Key) bool) *TreeMap {
 	return &TreeMap{
 		root: sentinel,
-		less: less,
+		Less: less,
 	}
 }
 
@@ -175,7 +175,7 @@ func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 		return ForwardIterator{tree: t, node: sentinel, end: sentinel}
 	}
 	for {
-		if t.less(node.key, key) {
+		if t.Less(node.key, key) {
 			if node.right != sentinel {
 				node = node.right
 			} else {
@@ -201,7 +201,7 @@ func (t *TreeMap) UpperBound(key Key) ForwardIterator {
 		return ForwardIterator{tree: t, node: sentinel, end: sentinel}
 	}
 	for {
-		if !t.less(key, node.key) {
+		if !t.Less(key, node.key) {
 			if node.right != sentinel {
 				node = node.right
 			} else {
@@ -336,7 +336,7 @@ func (t *TreeMap) insertNode(id Key, value Value) {
 			return
 		}
 		parent = current
-		if t.less(id, current.key) {
+		if t.Less(id, current.key) {
 			current = current.left
 		} else {
 			current = current.right
@@ -351,7 +351,7 @@ func (t *TreeMap) insertNode(id Key, value Value) {
 		key:    id,
 	}
 	if parent != nil {
-		if t.less(id, parent.key) {
+		if t.Less(id, parent.key) {
 			parent.left = x
 		} else {
 			parent.right = x
@@ -464,7 +464,7 @@ func (t *TreeMap) findNode(id Key) *node {
 		if id == current.key {
 			return current
 		}
-		if t.less(id, current.key) {
+		if t.Less(id, current.key) {
 			current = current.left
 		} else {
 			current = current.right

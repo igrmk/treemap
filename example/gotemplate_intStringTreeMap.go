@@ -84,7 +84,7 @@ func init() {
 type intStringTreeMap struct {
 	root  *nodeIntStringTreeMap
 	count int
-	less  func(int, int) bool
+	Less  func(int, int) bool
 }
 
 // New creates the new red-black tree based TreeMap.
@@ -92,7 +92,7 @@ type intStringTreeMap struct {
 func newIntStringTreeMap(less func(a int, b int) bool) *intStringTreeMap {
 	return &intStringTreeMap{
 		root: sentinelIntStringTreeMap,
-		less: less,
+		Less: less,
 	}
 }
 
@@ -175,7 +175,7 @@ func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
-		if t.less(node.key, key) {
+		if t.Less(node.key, key) {
 			if node.right != sentinelIntStringTreeMap {
 				node = node.right
 			} else {
@@ -201,7 +201,7 @@ func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
 		return forwardIteratorIntStringTreeMap{tree: t, node: sentinelIntStringTreeMap, end: sentinelIntStringTreeMap}
 	}
 	for {
-		if !t.less(key, node.key) {
+		if !t.Less(key, node.key) {
 			if node.right != sentinelIntStringTreeMap {
 				node = node.right
 			} else {
@@ -336,7 +336,7 @@ func (t *intStringTreeMap) insertNode(id int, value string) {
 			return
 		}
 		parent = current
-		if t.less(id, current.key) {
+		if t.Less(id, current.key) {
 			current = current.left
 		} else {
 			current = current.right
@@ -351,7 +351,7 @@ func (t *intStringTreeMap) insertNode(id int, value string) {
 		key:    id,
 	}
 	if parent != nil {
-		if t.less(id, parent.key) {
+		if t.Less(id, parent.key) {
 			parent.left = x
 		} else {
 			parent.right = x
@@ -464,7 +464,7 @@ func (t *intStringTreeMap) findNode(id int) *nodeIntStringTreeMap {
 		if id == current.key {
 			return current
 		}
-		if t.less(id, current.key) {
+		if t.Less(id, current.key) {
 			current = current.left
 		} else {
 			current = current.right
