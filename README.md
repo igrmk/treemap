@@ -13,7 +13,9 @@ Meanwhile you can use my version of it https://github.com/igrmk/gotemplate with 
 Generic `TreeMap` uses red-black tree under the hood.
 This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
 You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
-See example folder for generating `TreeMap<int, string>`.
+See example folder for generating `TreeMap` with `int` key and `string` value.
+The package is useful without generation as well.
+It uses `interface{}` for both key and value in this case.
 The package is based on [ebony](https://github.com/logrusorgru/ebony) due to outstanding test coverage.
 Iterators are designed after Java. This design works well in Go.
 It is not thread safe.
