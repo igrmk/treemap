@@ -29,7 +29,7 @@ import (
 	"testing"
 )
 
-func less(x Key, y Key) bool { return x.(int) < y.(int) }
+func less(x, y Key) bool { return x.(int) < y.(int) }
 
 func value(x string) Value { return Value(x) }
 
