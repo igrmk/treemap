@@ -36,7 +36,7 @@ Generating TreeMap with int keys and string values
 
 	//go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
 
-	func less(x int, y int) bool { return x < y }
+	func less(x, y int) bool { return x < y }
 
 	func main() {
 		tr := newIntStringTreeMap(less)
