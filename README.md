@@ -13,12 +13,11 @@ Meanwhile you can use my fork of it https://github.com/igrmk/gotemplate with fix
 Generic `TreeMap` uses red-black tree under the hood.
 This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
 You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
-See example folder for an illustration of generation of `TreeMap` with `int` key and `string` value.
+See example folder for an illustration of generating `TreeMap` with `int` key and `string` value.
 The package is useful without generation as well.
 It uses `interface{}` for both key and value in this case.
-The package is based on [ebony](https://github.com/logrusorgru/ebony) due to outstanding test coverage.
-Iterators are designed after Java. This design works well in Go.
-It is not thread safe.
+Iterators are designed after C++. This design works well in Go.
+This data structure is not thread safe.
 
 ### Usage
 
@@ -36,9 +35,8 @@ func main() {
 	tr.Set(0, "Hello")
 	tr.Set(1, "World")
 
-	for it := tr.Iterator(); it.HasNext(); {
-		k, v := it.Next()
-		fmt.Println(k, v)
+	for it := tr.Iterator(); it.HasNext(); it.Next() {
+		fmt.Println(it.Key(), it.Value())
 	}
 }
 ```
@@ -71,10 +69,10 @@ go get github.com/igrmk/treemap
 | `Get`       | O(log*N*) |
 | `Contains`  | O(log*N*) |
 | `Count`     | O(1)      |
-| `Max`       | O(log*N*) |
-| `Min`       | O(log*N*) |
 | `Clear`     | O(1)      |
 | `Range`     | O(log*N*) |
+| `Iterator`  | O(1)      |
+| `Reverse`   | O(log*N*) |
 | Iteration   | O(*N*)    |
 
 ### Memory usage

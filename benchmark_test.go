@@ -33,7 +33,7 @@ import (
 func BenchmarkSeqSet(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		tr := New(less)
-		for j := 0; j < MapSize; j++ {
+		for j := 0; j < NumIters; j++ {
 			tr.Set(j, "")
 		}
 	}
@@ -43,70 +43,14 @@ func BenchmarkSeqSet(b *testing.B) {
 func BenchmarkSeqGet(b *testing.B) {
 	b.StopTimer()
 	tr := New(less)
-	for i := 0; i < MapSize; i++ {
+	for i := 0; i < NumIters; i++ {
 		tr.Set(i, "")
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < MapSize; j++ {
+		for j := 0; j < NumIters; j++ {
 			tr.Get(j)
 		}
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkSeqSetDel(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		for j := 0; j < MapSize; j++ {
-			tr.Set(j, "")
-		}
-		for j := 0; j < MapSize; j++ {
-			tr.Del(j)
-		}
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkSeqExs(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	for i := 0; i < MapSize; i++ {
-		tr.Set(i, "")
-	}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		for j := 0; j < MapSize; j++ {
-			tr.Contains(j)
-		}
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkSeqMin(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	for i := 0; i < MapSize; i++ {
-		tr.Set(i, "")
-	}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tr.Min()
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkSeqMax(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	for i := 0; i < MapSize; i++ {
-		tr.Set(i, "")
-	}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tr.Max()
 	}
 	b.ReportAllocs()
 }
@@ -114,34 +58,28 @@ func BenchmarkSeqMax(b *testing.B) {
 func BenchmarkSeqIter(b *testing.B) {
 	b.StopTimer()
 	tr := New(less)
-	for i := 0; i < MapSize; i++ {
+	for i := 0; i < NumIters; i++ {
 		tr.Set(i, "")
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		for it := tr.Iterator(); it.HasNext(); {
-			it.Next()
+		for it := tr.Iterator(); it.Valid(); it.Next() {
 		}
 	}
 	b.ReportAllocs()
 }
 
-// random
-
-func shuffle(ary []Key) {
-	for i := range ary {
-		j := rand.Intn(i + 1)
-		ary[i], ary[j] = ary[j], ary[i]
+func randoms() []Key {
+	ks := make([]Key, NumIters)
+	for i := range ks {
+		ks[i] = int(rand.Int63n(NumIters * 100))
 	}
+	return ks
 }
 
 func BenchmarkRndSet(b *testing.B) {
-	t := int64(MapSize * 2)
 	b.StopTimer()
-	ks := make([]Key, MapSize)
-	for i := range ks {
-		ks[i] = int(rand.Int63n(t))
-	}
+	ks := randoms()
 	tr := New(less)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -156,14 +94,10 @@ func BenchmarkRndSet(b *testing.B) {
 func BenchmarkRndGet(b *testing.B) {
 	b.StopTimer()
 	tr := New(less)
-	ks := make([]Key, MapSize)
-	t := int64(MapSize * 2)
-	for i := range ks {
-		k := int(rand.Int63n(t))
-		ks[i] = k
+	ks := randoms()
+	for _, k := range ks {
 		tr.Set(k, "")
 	}
-	shuffle(ks)
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
 		for _, k := range ks {
@@ -173,88 +107,16 @@ func BenchmarkRndGet(b *testing.B) {
 	b.ReportAllocs()
 }
 
-func BenchmarkRndSetDel(b *testing.B) {
-	b.StopTimer()
-	ks := make([]Key, MapSize)
-	t := int64(MapSize * 2)
-	for i := range ks {
-		ks[i] = int(rand.Int63n(t))
-	}
-	shuffle(ks)
-	tr := New(less)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		for _, k := range ks {
-			tr.Set(k, "")
-		}
-		for _, k := range ks {
-			tr.Del(k)
-		}
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkRndExs(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	ks := make([]Key, MapSize)
-	t := int64(MapSize * 2)
-	for i := range ks {
-		ks[i] = int(rand.Int63n(t))
-		tr.Set(ks[i], "")
-	}
-	shuffle(ks)
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		for _, t := range ks {
-			tr.Contains(t)
-		}
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkRndMin(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	t := int64(MapSize * 2)
-	for i := 0; i < MapSize; i++ {
-		k := int(rand.Int63n(t))
-		tr.Set(k, "")
-	}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tr.Min()
-	}
-	b.ReportAllocs()
-}
-
-func BenchmarkRndMax(b *testing.B) {
-	b.StopTimer()
-	tr := New(less)
-	t := int64(MapSize * 2)
-	for i := 0; i < MapSize; i++ {
-		k := int(rand.Int63n(t))
-		tr.Set(k, "")
-	}
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		tr.Max()
-	}
-	b.ReportAllocs()
-}
-
 func BenchmarkRndIter(b *testing.B) {
 	b.StopTimer()
 	tr := New(less)
-	t := int64(MapSize * 2)
-	for i := 0; i < MapSize; i++ {
-		k := int(rand.Int63n(t))
+	ks := randoms()
+	for _, k := range ks {
 		tr.Set(k, "")
 	}
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
-		for it := tr.Iterator(); it.HasNext(); {
-			it.Next()
+		for it := tr.Iterator(); it.Valid(); it.Next() {
 		}
 	}
 	b.ReportAllocs()

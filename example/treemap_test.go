@@ -29,31 +29,42 @@ import (
 	"testing"
 )
 
-func value(x string) string { return string(x) }
+func value(x string) string { return x }
+
+func TestNew(t *testing.T) {
+	tr := newIntStringTreeMap(less)
+	if tr.Count() != 0 {
+		t.Error("count should be zero")
+	}
+	if tr.endNode.left != nil {
+		t.Error("root should be zero")
+	}
+}
 
 func TestSet(t *testing.T) {
 	x := value("x")
 	tr := newIntStringTreeMap(less)
 	tr.Set(0, x)
-	if tr.root.key != 0 {
-		t.Errorf("[set] wrong id, expected 0, got %d", tr.root.key)
+	if tr.endNode.left.key != 0 {
+		t.Errorf("wrong key, expected 0, got %d", tr.endNode.left.key)
 	}
-	if v := tr.root.value; v != x {
-		t.Errorf(
-			"[set] wrong returned value, expected '%s', got '%s'", x, v)
+	if v := tr.endNode.left.value; v != x {
+		t.Errorf("wrong returned value, expected '%s', got '%s'", x, v)
 	}
-	if tr.count != 1 {
-		t.Errorf("[set] wrong count, expected 1, got %d", tr.count)
+	if tr.Count() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Count())
 	}
 }
 
 func TestDel(t *testing.T) {
-	x := "x"
 	tr := newIntStringTreeMap(less)
-	tr.Set(0, value(x))
+	tr.Set(0, "x")
 	tr.Del(0)
-	if tr.count != 0 {
-		t.Errorf("[del] wrong count after del, expected 0, got %d", tr.count)
+	if tr.Count() != 0 {
+		t.Errorf("wrong count after deletion, expected 0, got %d", tr.Count())
+	}
+	if tr.endNode.left != nil {
+		t.Error("wrong tree state after deletion")
 	}
 }
 
@@ -63,54 +74,52 @@ func TestGet(t *testing.T) {
 	tr.Set(0, x)
 	v, ok := tr.Get(0)
 	if v != x || !ok {
-		t.Errorf("[get] wrong returned value, expected 'x', got '%s'", v)
+		t.Errorf("wrong returned value, expected 'x', got '%s'", v)
 	}
-	if tr.count != 1 {
-		t.Errorf("[get] wrong count, expected 1, got %d", tr.count)
+	if tr.Count() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Count())
 	}
-	if v, ok := tr.Get(579); v != "" || ok {
-		t.Errorf("[get] wrong returned value, expected nil, got '%v'", v)
+	if v, ok := tr.Get(2); v != "" || ok {
+		t.Errorf("wrong returned value, expected nil, got '%v'", v)
 	}
-	if tr.count != 1 {
-		t.Errorf("[get] wrong count, expected 1, got %d", tr.count)
+	if tr.Count() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Count())
 	}
 }
 
-func TestExist(t *testing.T) {
-	x := value("x")
+func TestContains(t *testing.T) {
 	tr := newIntStringTreeMap(less)
-	tr.Set(0, x)
+	tr.Set(0, "x")
 	val := tr.Contains(0)
 	if !val {
-		t.Error("[exist] existing is not exist")
+		t.Error("existing is not exist")
 	}
-	val = tr.Contains(12)
+	val = tr.Contains(1)
 	if val {
-		t.Error("[exist] not existing is exist")
+		t.Error("not existing is exist")
 	}
 }
 
 func TestCount(t *testing.T) {
-	x := value("x")
 	tr := newIntStringTreeMap(less)
 	if tr.Count() != 0 {
-		t.Errorf("[count] wrong count, expected 0, got %d", tr.Count())
+		t.Errorf("wrong count, expected 0, got %d", tr.Count())
 	}
-	tr.Set(0, x)
+	tr.Set(0, "x")
 	if tr.Count() != 1 {
-		t.Errorf("[count] wrong count, expected 1, got %d", tr.Count())
+		t.Errorf("wrong count, expected 1, got %d", tr.Count())
 	}
-	tr.Set(1, x)
+	tr.Set(1, "x")
 	if tr.Count() != 2 {
-		t.Errorf("[count] wrong count, expected 2, got %d", tr.Count())
+		t.Errorf("wrong count, expected 2, got %d", tr.Count())
 	}
 	tr.Del(1)
 	if tr.Count() != 1 {
-		t.Errorf("[count] wrong count, expected 1, got %d", tr.Count())
+		t.Errorf("wrong count, expected 1, got %d", tr.Count())
 	}
 	tr.Del(0)
 	if tr.Count() != 0 {
-		t.Errorf("[count] wrong count, expected 0, got %d", tr.Count())
+		t.Errorf("wrong count, expected 0, got %d", tr.Count())
 	}
 }
 
@@ -120,86 +129,25 @@ func TestClear(t *testing.T) {
 	tr.Set(1, "y")
 	tr.Set(2, "z")
 	tr.Clear()
-	if tr.count != 0 {
-		t.Error("[empty] count != 0")
+	if tr.Count() != 0 {
+		t.Error("count is not zero")
+	}
+	if tr.endNode.left != nil {
+		t.Error("root is not nil")
 	}
 }
 
-func TestMax(t *testing.T) {
-	max := value("max")
-	maxi := 6
-	tr := newIntStringTreeMap(less)
-	tr.Set(0, "x")
-	tr.Set(1, "y")
-	tr.Set(2, "z")
-	tr.Set(maxi, max)
-	tr.Set(3, "m")
-	tr.Set(4, "n")
-	tr.Set(5, "o")
-	i, v := tr.Max()
-	if i != maxi {
-		t.Errorf("[max] wrong index of min, expected %d, got %d", maxi, i)
+func testRange(t *testing.T, it, end forwardIteratorIntStringTreeMap, exp []string) {
+	var got []string
+	for ; it != end; it.Next() {
+		got = append(got, it.Value())
 	}
-	if v != max {
-		t.Errorf(
-			"[max] wrong returned value, expected '%s', got '%s'",
-			max, v)
+	if len(got) != len(exp) {
+		t.Errorf("wrong range length, expected %d, got %d", len(exp), len(got))
 	}
-}
-
-func TestMin(t *testing.T) {
-	min := value("min")
-	mini := 0
-	tr := newIntStringTreeMap(less)
-	tr.Set(1, "x")
-	tr.Set(2, "y")
-	tr.Set(3, "z")
-	tr.Set(mini, min)
-	tr.Set(4, "m")
-	tr.Set(5, "n")
-	tr.Set(6, "o")
-	i, v := tr.Min()
-	if i != mini {
-		t.Errorf("[min] wrong index of min, expected %d, got %d", mini, i)
-	}
-	if v != min {
-		t.Errorf("[min] wrong returned value, expected '%s', got '%s'",
-			min, v)
-	}
-}
-
-func testRange13(tr *intStringTreeMap, t *testing.T) {
-	var vls []string
-	for it := tr.Range(1, 3); it.HasNext(); {
-		_, v := it.Next()
-		vls = append(vls, v)
-	}
-	if len(vls) != 3 {
-		t.Errorf("[range] wrong range length, expected 3, got %d", len(vls))
-	}
-	r13 := []string{"y", "z", "m"}
-	for i := 0; i < len(vls) && i < len(r13); i++ {
-		if vls[i] != r13[i] {
-			t.Errorf("[range] wrong value, expected '%s', got '%s'",
-				r13[i], vls[i])
-		}
-	}
-}
-
-func testRange19(tr *intStringTreeMap, t *testing.T) {
-	var vls []string
-	for it := tr.Range(1, 9); it.HasNext(); {
-		_, v := it.Next()
-		vls = append(vls, v)
-	}
-	if len(vls) != 4 {
-		t.Errorf("[range] wrong range length, expected 4, got %d", len(vls))
-	}
-	r19 := []string{"y", "z", "m", "n"}
-	for i := 0; i < len(vls) && i < len(r19); i++ {
-		if vls[i] != r19[i] {
-			t.Errorf("[range] wrong value, expected '%s', got '%s'",
-				r19[i], vls[i])
+	for i, v := range exp {
+		if got[i] != v {
+			t.Errorf("wrong value, expected '%s', got '%s'", exp[i], got[i])
 		}
 	}
 }
@@ -211,14 +159,16 @@ func TestRange(t *testing.T) {
 	tr.Set(2, "z")
 	tr.Set(3, "m")
 	tr.Set(4, "n")
-	testRange13(tr, t)
-	testRange19(tr, t)
+	it, end := tr.Range(1, 3)
+	testRange(t, it, end, []string{"y", "z", "m"})
+	it, end = tr.Range(1, 9)
+	testRange(t, it, end, []string{"y", "z", "m", "n"})
 }
 
 func TestLowerBound(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	it := tr.LowerBound(0)
-	if it.HasNext() {
+	if it.Valid() {
 		t.Error("lower bound should not exists")
 		return
 	}
@@ -247,18 +197,18 @@ func TestLowerBound(t *testing.T) {
 
 	for _, tb := range tbl {
 		it = tr.LowerBound(tb[0])
-		if !it.HasNext() {
+		if !it.Valid() {
 			t.Error("lower bound should exists")
 			return
 		}
-		if k, _ := it.Next(); k != tb[1] {
+		if k := it.Key(); k != tb[1] {
 			t.Errorf("lower bound should be %v", tb[1])
 			return
 		}
 	}
 
 	it = tr.LowerBound(21)
-	if it.HasNext() {
+	if it.Valid() {
 		t.Error("lower bound should not exists")
 		return
 	}
@@ -267,8 +217,8 @@ func TestLowerBound(t *testing.T) {
 func TestUpperBound(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	it := tr.UpperBound(0)
-	if it.HasNext() {
-		t.Error("lower bound should not exists")
+	if it.Valid() {
+		t.Error("upper bound should not exists")
 		return
 	}
 	tr.Set(2, "a")
@@ -295,24 +245,24 @@ func TestUpperBound(t *testing.T) {
 
 	for _, tb := range tbl {
 		it = tr.UpperBound(tb[0])
-		if !it.HasNext() {
+		if !it.Valid() {
 			t.Error("lower bound should exists")
 			return
 		}
-		if k, _ := it.Next(); k != tb[1] {
-			t.Errorf("lower bound should be %v", tb[1])
+		if k := it.Key(); k != tb[1] {
+			t.Errorf("upper bound should be %v", tb[1])
 			return
 		}
 	}
 
 	it = tr.UpperBound(20)
-	if it.HasNext() {
-		t.Error("lower bound should not exists")
+	if it.Valid() {
+		t.Error("upper bound should not exists")
 		return
 	}
 	it = tr.UpperBound(21)
-	if it.HasNext() {
-		t.Error("lower bound should not exists")
+	if it.Valid() {
+		t.Error("upper bound should not exists")
 		return
 	}
 }
@@ -324,8 +274,8 @@ func TestEmptyRange(t *testing.T) {
 	tr.Set(2, "z")
 	tr.Set(3, "m")
 	tr.Set(4, "n")
-	if rng := tr.Range(5, 10); rng.HasNext() {
-		t.Error("[empty range] range should be empty")
+	if rng, end := tr.Range(5, 10); rng != end {
+		t.Error("range should be empty")
 	}
 }
 
@@ -334,9 +284,8 @@ func TestDelNil(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	tr.Set(0, value(x))
 	tr.Del(1)
-	if tr.count != 1 {
-		t.Errorf("[del nil] wrong count after del, expected 1, got %d",
-			tr.count)
+	if tr.Count() != 1 {
+		t.Errorf("wrong count after del, expected 1, got %d", tr.Count())
 	}
 }
 
@@ -356,18 +305,16 @@ func TestIteration(t *testing.T) {
 		tr.Set(kv.key, kv.value)
 	}
 	count := 0
-	for it := tr.Iterator(); it.HasNext(); {
-		k, v := it.Next()
-		if kvs[count].key != k || kvs[count].value != v {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, k, v)
+	for it := tr.Iterator(); it.Valid(); it.Next() {
+		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
+			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
 		}
 		count++
 	}
-	for it := tr.Reverse(); it.HasNext(); {
+	for it := tr.Reverse(); it.Valid(); it.Next() {
 		count--
-		k, v := it.Next()
-		if kvs[count].key != k || kvs[count].value != v {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, k, v)
+		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
+			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
 		}
 	}
 }
@@ -380,7 +327,7 @@ func TestOutOfBoundsIteration(t *testing.T) {
 	tr.Set(3, "d")
 	tr.Set(4, "e")
 	it := tr.Iterator()
-	for it.HasNext() {
+	for it.Valid() {
 		it.Next()
 	}
 	defer func() {
@@ -391,15 +338,14 @@ func TestOutOfBoundsIteration(t *testing.T) {
 	it.Next()
 }
 
-func TestOneSizeRange(t *testing.T) {
+func TestRangeSingle(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")
 	visited := false
-	for it := tr.Range(1, 1); it.HasNext(); {
-		_, v := it.Next()
-		if visited || v != "b" {
+	for it, end := tr.Range(1, 1); it != end; it.Next() {
+		if visited || it.Value() != "b" {
 			t.Error("only single element 'b' should be found")
 		}
 		visited = true

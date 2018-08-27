@@ -67,33 +67,10 @@ func ExampleTreeMap_Contains() {
 func ExampleTreeMap_Count() {
 	tr := New(less)
 	tr.Set(0, "hello")
-	fmt.Println(tr.Count())
-	tr.Set(0, "hello")
-	fmt.Println(tr.Count())
-	tr.Set(1, "hi")
+	tr.Set(1, "world")
 	fmt.Println(tr.Count())
 	// Output:
-	// 1
-	// 1
 	// 2
-}
-
-func ExampleTreeMap_Min() {
-	tr := New(less)
-	tr.Set(0, "hello")
-	tr.Set(1, "hi")
-	fmt.Println(tr.Min())
-	// Output:
-	// 0 hello
-}
-
-func ExampleTreeMap_Max() {
-	tr := New(less)
-	tr.Set(0, "hello")
-	tr.Set(1, "hi")
-	fmt.Println(tr.Max())
-	// Output:
-	// 1 hi
 }
 
 func ExampleTreeMap_Clear() {
@@ -111,9 +88,8 @@ func ExampleTreeMap_Iterator() {
 	tr.Set(1, "one")
 	tr.Set(2, "two")
 	tr.Set(3, "three")
-	for it := tr.Iterator(); it.HasNext(); {
-		key, value := it.Next()
-		fmt.Println(key, "-", value)
+	for it := tr.Iterator(); it.Valid(); it.Next() {
+		fmt.Println(it.Key(), "-", it.Value())
 	}
 	// Output:
 	// 1 - one
@@ -126,9 +102,8 @@ func ExampleTreeMap_Reverse() {
 	tr.Set(1, "one")
 	tr.Set(2, "two")
 	tr.Set(3, "three")
-	for it := tr.Reverse(); it.HasNext(); {
-		key, value := it.Next()
-		fmt.Println(key, "-", value)
+	for it := tr.Reverse(); it.Valid(); it.Next() {
+		fmt.Println(it.Key(), "-", it.Value())
 	}
 	// Output:
 	// 3 - three

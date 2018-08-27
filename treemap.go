@@ -1,61 +1,4 @@
-// Copyright (c) 2018 Igor Mikushkin <igor.mikushkin@gmail.com>.
-// All rights reserved. This program is free software. It comes without
-// any warranty, to the extent permitted by applicable law. You can
-// redistribute it and/or modify it under the terms of the Do What
-// The Fuck You Want To Public License, Version 2, as published by
-// Sam Hocevar. See LICENSE file for more details or see below.
-//
-
-//
-//        DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-//                    Version 2, December 2004
-//
-// Copyright (C) 2004 Sam Hocevar <sam@hocevar.net>
-//
-// Everyone is permitted to copy and distribute verbatim or modified
-// copies of this license document, and changing it is allowed as long
-// as the name is changed.
-//
-//            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-//   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
-//
-//  0. You just DO WHAT THE FUCK YOU WANT TO.
-//
-
-/*
-Package treemap uses red-black tree under the hood.
-This is gotemplate ready package.
-You can use it as a template to generate TreeMap with specific Key and Value types.
-
-Generating TreeMap with int keys and string values
-	package main
-
-	import "fmt"
-
-	//go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
-
-	func less(x, y int) bool { return x < y }
-
-	func main() {
-		tr := newIntStringTreeMap(less)
-		tr.Set(0, "Hello")
-		tr.Set(1, "World")
-
-		for it := tr.Iterator(); it.HasNext(); {
-			k, v := it.Next()
-			fmt.Println(k, v)
-		}
-	}
-It is not thread safe.
-*/
 package treemap
-
-type color bool
-
-const (
-	red   color = true
-	black color = false
-)
 
 // template type TreeMap(Key, Value)
 
@@ -65,128 +8,136 @@ type Key interface{}
 // Value is a generic value type of the map
 type Value interface{}
 
-type node struct {
-	left   *node
-	right  *node
-	parent *node
-	color  color
-	key    Key
-	value  Value
-}
-
-var sentinel = &node{left: nil, right: nil, parent: nil, color: black}
-
-func init() {
-	sentinel.left, sentinel.right = sentinel, sentinel
-}
-
 // TreeMap is the red-black tree based map
 type TreeMap struct {
-	root  *node
-	count int
-	Less  func(Key, Key) bool
+	endNode   *node
+	beginNode *node
+	count     int
+	Less      func(Key, Key) bool
 }
 
-// New creates the new red-black tree based TreeMap.
+type node struct {
+	right   *node
+	left    *node
+	parent  *node
+	isBlack bool
+	key     Key
+	value   Value
+}
+
+// New creates and returns new TreeMap.
 // Parameter less is a function returning a < b.
 func New(less func(a Key, b Key) bool) *TreeMap {
-	return &TreeMap{
-		root: sentinel,
-		Less: less,
-	}
+	endNode := &node{isBlack: true}
+	return &TreeMap{beginNode: endNode, endNode: endNode, Less: less}
 }
 
-// Set the value. Silently override previous value if exists. This will overwrite the existing value.
+// Count returns total count of elements in a map.
+// Complexity: O(1).
+func (t *TreeMap) Count() int { return t.count }
+
+// Set sets the value and silently overrides previous value if it exists.
 // Complexity: O(log N).
-func (t *TreeMap) Set(id Key, value Value) {
-	t.insertNode(id, value)
+func (t *TreeMap) Set(key Key, value Value) {
+	parent := t.endNode
+	current := parent.left
+	less := true
+	for current != nil {
+		parent = current
+		switch {
+		case t.Less(key, current.key):
+			current = current.left
+			less = true
+		case t.Less(current.key, key):
+			current = current.right
+			less = false
+		default:
+			current.value = value
+			return
+		}
+	}
+	x := &node{parent: parent, value: value, key: key}
+	if less {
+		parent.left = x
+	} else {
+		parent.right = x
+	}
+	if t.beginNode.left != nil {
+		t.beginNode = t.beginNode.left
+	}
+	t.insertFixup(x)
+	t.count++
 }
 
 // Del deletes the value.
 // Complexity: O(log N).
-func (t *TreeMap) Del(id Key) {
-	t.deleteNode(t.findNode(id))
+func (t *TreeMap) Del(key Key) {
+	z := t.findNode(key)
+	if z == nil {
+		return
+	}
+	if t.beginNode == z {
+		if z.right != nil {
+			t.beginNode = z.right
+		} else {
+			t.beginNode = z.parent
+		}
+	}
+	t.count--
+	removeNode(t.endNode.left, z)
+}
+
+// Clear clears the map.
+// Complexity: O(1).
+func (t *TreeMap) Clear() {
+	t.count = 0
+	t.beginNode = t.endNode
+	t.endNode.left = nil
 }
 
 // Get retrieves a value from a map for specified key and reports if it exists.
 // Complexity: O(log N).
 func (t *TreeMap) Get(id Key) (Value, bool) {
 	node := t.findNode(id)
-	if node == sentinel {
-		return node.value, false
+	if node == nil {
+		node = t.endNode
 	}
-	return node.value, true
+	return node.value, node != t.endNode
 }
 
 // Contains checks if key exists in a map.
 // Complexity: O(log N)
-func (t *TreeMap) Contains(id Key) bool {
-	return t.findNode(id) != sentinel
-}
+func (t *TreeMap) Contains(id Key) bool { return t.findNode(id) != nil }
 
-// Count returns total count of elements in a map.
-// Complexity: O(1).
-func (t *TreeMap) Count() int {
-	return t.count
-}
-
-// Clear clears the map.
-// Complexity: O(1).
-func (t *TreeMap) Clear() *TreeMap {
-	t.root = sentinel
-	t.count = 0
-	return t
-}
-
-// Max returns maximum key and associated value.
+// Range returns an iterator that goes through all the keys in the range [from, to].
 // Complexity: O(log N).
-func (t *TreeMap) Max() (Key, Value) {
-	current := t.root
-	for current.right != sentinel {
-		current = current.right
-	}
-	return current.key, current.value
-}
-
-// Min returns minimum key and associated value.
-// Complexity: O(log N).
-func (t *TreeMap) Min() (Key, Value) {
-	current := t.root
-	for current.left != sentinel {
-		current = current.left
-	}
-	return current.key, current.value
-}
-
-// Range returns an iterator such that it goes through all the keys in the range [from, to].
-// Complexity: O(log N).
-func (t *TreeMap) Range(from, to Key) ForwardIterator {
+func (t *TreeMap) Range(from, to Key) (ForwardIterator, ForwardIterator) {
 	lower := t.LowerBound(from)
 	upper := t.UpperBound(to)
-	return ForwardIterator{tree: t, node: lower.node, end: upper.node}
+	return ForwardIterator{tree: t, node: lower.node}, ForwardIterator{tree: t, node: upper.node}
 }
 
 // LowerBound returns an iterator such that it goes through all the keys in the range [key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *TreeMap) LowerBound(key Key) ForwardIterator {
-	node := t.root
-	result := sentinel
-	if node == sentinel {
-		return ForwardIterator{tree: t, node: sentinel, end: sentinel}
+	result := t.endNode
+	node := t.endNode.left
+	if node == nil {
+		return ForwardIterator{tree: t, node: t.endNode}
 	}
 	for {
 		if t.Less(node.key, key) {
-			if node.right != sentinel {
+			if node.right != nil {
 				node = node.right
 			} else {
-				return ForwardIterator{tree: t, node: result, end: sentinel}
+				return ForwardIterator{tree: t, node: result}
 			}
 		} else {
 			result = node
-			if node.left != sentinel {
+			if node.left != nil {
 				node = node.left
 			} else {
-				return ForwardIterator{tree: t, node: result, end: sentinel}
+				return ForwardIterator{tree: t, node: result}
 			}
 		}
 	}
@@ -195,353 +146,350 @@ func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 // UpperBound returns an iterator such that it goes through all the keys in the range (key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *TreeMap) UpperBound(key Key) ForwardIterator {
-	node := t.root
-	result := sentinel
-	if node == sentinel {
-		return ForwardIterator{tree: t, node: sentinel, end: sentinel}
+	result := t.endNode
+	node := t.endNode.left
+	if node == nil {
+		return ForwardIterator{tree: t, node: t.endNode}
 	}
 	for {
 		if !t.Less(key, node.key) {
-			if node.right != sentinel {
+			if node.right != nil {
 				node = node.right
 			} else {
-				return ForwardIterator{tree: t, node: result, end: sentinel}
+				return ForwardIterator{tree: t, node: result}
 			}
 		} else {
 			result = node
-			if node.left != sentinel {
+			if node.left != nil {
 				node = node.left
 			} else {
-				return ForwardIterator{tree: t, node: result, end: sentinel}
+				return ForwardIterator{tree: t, node: result}
 			}
 		}
 	}
 }
 
 // Iterator returns an iterator for tree map.
-// It starts at the one-before-the-start position and goes to the end.
+// It starts at the first element and goes to the one-past-the-end position.
 // You can iterate a map at O(N) complexity.
-func (t *TreeMap) Iterator() ForwardIterator {
-	node := t.root
-	for node.left != sentinel {
-		node = node.left
-	}
-	return ForwardIterator{tree: t, node: node, end: sentinel}
-}
+// Method complexity: O(1)
+func (t *TreeMap) Iterator() ForwardIterator { return ForwardIterator{tree: t, node: t.beginNode} }
 
 // Reverse returns a reverse iterator for tree map.
-// It starts at the one-past-the-end position and goes to the beginning.
+// It starts at the last element and goes to the one-before-the-start position.
 // You can iterate a map at O(N) complexity.
+// Method complexity: O(log N)
 func (t *TreeMap) Reverse() ReverseIterator {
-	node := t.root
-	for node.right != sentinel {
-		node = node.right
+	node := t.endNode.left
+	if node != nil {
+		node = mostRight(node)
 	}
-	return ReverseIterator{tree: t, node: node, end: sentinel}
+	return ReverseIterator{tree: t, node: node}
 }
 
-func (t *TreeMap) rotateLeft(x *node) {
+func (t *TreeMap) findNode(id Key) *node {
+	current := t.endNode.left
+	for current != nil {
+		switch {
+		case t.Less(id, current.key):
+			current = current.left
+		case t.Less(current.key, id):
+			current = current.right
+		default:
+			return current
+		}
+	}
+	return nil
+}
+
+func mostLeft(x *node) *node {
+	for x.left != nil {
+		x = x.left
+	}
+	return x
+}
+
+func mostRight(x *node) *node {
+	for x.right != nil {
+		x = x.right
+	}
+	return x
+}
+
+func successor(x *node) *node {
+	if x.right != nil {
+		return mostLeft(x.right)
+	}
+	for x != x.parent.left {
+		x = x.parent
+	}
+	return x.parent
+}
+
+func predcessor(x *node) *node {
+	if x.left != nil {
+		return mostRight(x.left)
+	}
+	for x.parent != nil && x != x.parent.right {
+		x = x.parent
+	}
+	return x.parent
+}
+
+func rotateLeft(x *node) {
 	y := x.right
 	x.right = y.left
-	if y.left != sentinel {
-		y.left.parent = x
+	if x.right != nil {
+		x.right.parent = x
 	}
-	if y != sentinel {
-		y.parent = x.parent
-	}
-	if x.parent != nil {
-		if x == x.parent.left {
-			x.parent.left = y
-		} else {
-			x.parent.right = y
-		}
+	y.parent = x.parent
+	if x == x.parent.left {
+		x.parent.left = y
 	} else {
-		t.root = y
+		x.parent.right = y
 	}
 	y.left = x
-	if x != sentinel {
-		x.parent = y
-	}
+	x.parent = y
 }
 
-func (t *TreeMap) rotateRight(x *node) {
+func rotateRight(x *node) {
 	y := x.left
 	x.left = y.right
-	if y.right != sentinel {
-		y.right.parent = x
+	if x.left != nil {
+		x.left.parent = x
 	}
-	if y != sentinel {
-		y.parent = x.parent
-	}
-	if x.parent != nil {
-		if x == x.parent.right {
-			x.parent.right = y
-		} else {
-			x.parent.left = y
-		}
+	y.parent = x.parent
+	if x == x.parent.left {
+		x.parent.left = y
 	} else {
-		t.root = y
+		x.parent.right = y
 	}
 	y.right = x
-	if x != sentinel {
-		x.parent = y
-	}
+	x.parent = y
 }
 
 func (t *TreeMap) insertFixup(x *node) {
-	for x != t.root && x.parent.color == red {
+	root := t.endNode.left
+	x.isBlack = x == root
+	for x != root && !x.parent.isBlack {
 		if x.parent == x.parent.parent.left {
 			y := x.parent.parent.right
-			if y.color == red {
-				x.parent.color = black
-				y.color = black
-				x.parent.parent.color = red
-				x = x.parent.parent
+			if y != nil && !y.isBlack {
+				x = x.parent
+				x.isBlack = true
+				x = x.parent
+				x.isBlack = x == root
+				y.isBlack = true
 			} else {
-				if x == x.parent.right {
+				if x != x.parent.left {
 					x = x.parent
-					t.rotateLeft(x)
+					rotateLeft(x)
 				}
-				x.parent.color = black
-				x.parent.parent.color = red
-				t.rotateRight(x.parent.parent)
+				x = x.parent
+				x.isBlack = true
+				x = x.parent
+				x.isBlack = false
+				rotateRight(x)
+				break
 			}
 		} else {
 			y := x.parent.parent.left
-			if y.color == red {
-				x.parent.color = black
-				y.color = black
-				x.parent.parent.color = red
-				x = x.parent.parent
+			if y != nil && !y.isBlack {
+				x = x.parent
+				x.isBlack = true
+				x = x.parent
+				x.isBlack = x == root
+				y.isBlack = true
 			} else {
 				if x == x.parent.left {
 					x = x.parent
-					t.rotateRight(x)
+					rotateRight(x)
 				}
-				x.parent.color = black
-				x.parent.parent.color = red
-				t.rotateLeft(x.parent.parent)
+				x = x.parent
+				x.isBlack = true
+				x = x.parent
+				x.isBlack = false
+				rotateLeft(x)
+				break
 			}
 		}
 	}
-	t.root.color = black
-}
-
-func (t *TreeMap) insertNode(id Key, value Value) {
-	current := t.root
-	var parent *node
-	for current != sentinel {
-		if !t.Less(id, current.key) && !t.Less(current.key, id) {
-			current.value = value
-			return
-		}
-		parent = current
-		if t.Less(id, current.key) {
-			current = current.left
-		} else {
-			current = current.right
-		}
-	}
-	x := &node{
-		value:  value,
-		parent: parent,
-		left:   sentinel,
-		right:  sentinel,
-		color:  red,
-		key:    id,
-	}
-	if parent != nil {
-		if t.Less(id, parent.key) {
-			parent.left = x
-		} else {
-			parent.right = x
-		}
-	} else {
-		t.root = x
-	}
-	t.insertFixup(x)
-	t.count++
 }
 
 // nolint: gocyclo
-func (t *TreeMap) deleteFixup(x *node) {
-	for x != t.root && x.color == black {
-		if x == x.parent.left {
-			w := x.parent.right
-			if w.color == red {
-				w.color = black
-				x.parent.color = red
-				t.rotateLeft(x.parent)
-				w = x.parent.right
-			}
-			if w.left.color == black && w.right.color == black {
-				w.color = red
-				x = x.parent
-			} else {
-				if w.right.color == black {
-					w.left.color = black
-					w.color = red
-					t.rotateRight(w)
-					w = x.parent.right
-				}
-				w.color = x.parent.color
-				x.parent.color = black
-				w.right.color = black
-				t.rotateLeft(x.parent)
-				x = t.root
-			}
-		} else {
-			w := x.parent.left
-			if w.color == red {
-				w.color = black
-				x.parent.color = red
-				t.rotateRight(x.parent)
-				w = x.parent.left
-			}
-			if w.right.color == black && w.left.color == black {
-				w.color = red
-				x = x.parent
-			} else {
-				if w.left.color == black {
-					w.right.color = black
-					w.color = red
-					t.rotateLeft(w)
-					w = x.parent.left
-				}
-				w.color = x.parent.color
-				x.parent.color = black
-				w.left.color = black
-				t.rotateRight(x.parent)
-				x = t.root
-			}
-		}
-	}
-	x.color = black
-}
-
-// nolint: gocyclo
-func (t *TreeMap) deleteNode(z *node) {
-	var x, y *node
-	if z == nil || z == sentinel {
-		return
-	}
-	if z.left == sentinel || z.right == sentinel {
+func removeNode(root *node, z *node) {
+	var y *node
+	if z.left == nil || z.right == nil {
 		y = z
 	} else {
-		y = z.right
-		for y.left != sentinel {
-			y = y.left
-		}
+		y = successor(z)
 	}
-	if y.left != sentinel {
+	var x *node
+	if y.left != nil {
 		x = y.left
 	} else {
 		x = y.right
 	}
-	x.parent = y.parent
-	if y.parent != nil {
-		if y == y.parent.left {
-			y.parent.left = x
+	var w *node
+	if x != nil {
+		x.parent = y.parent
+	}
+	if y == y.parent.left {
+		y.parent.left = x
+		if y != root {
+			w = y.parent.right
 		} else {
-			y.parent.right = x
+			root = x // w == nil
 		}
 	} else {
-		t.root = x
+		y.parent.right = x
+		w = y.parent.left
 	}
+	removedBlack := y.isBlack
 	if y != z {
-		z.key = y.key
-		z.value = y.value
-	}
-	if y.color == black {
-		t.deleteFixup(x)
-	}
-	t.count--
-}
-
-func (t *TreeMap) findNode(id Key) *node {
-	current := t.root
-	for current != sentinel {
-		if !t.Less(id, current.key) && !t.Less(current.key, id) {
-			return current
-		}
-		if t.Less(id, current.key) {
-			current = current.left
+		y.parent = z.parent
+		if z == z.parent.left {
+			y.parent.left = y
 		} else {
-			current = current.right
+			y.parent.right = y
+		}
+		y.left = z.left
+		y.left.parent = y
+		y.right = z.right
+		if y.right != nil {
+			y.right.parent = y
+		}
+		y.isBlack = z.isBlack
+		if root == z {
+			root = y
 		}
 	}
-	return sentinel
+	if removedBlack && root != nil {
+		if x != nil {
+			x.isBlack = true
+		} else {
+			for {
+				if w != w.parent.left {
+					if !w.isBlack {
+						w.isBlack = true
+						w.parent.isBlack = false
+						rotateLeft(w.parent)
+						if root == w.left {
+							root = w
+						}
+						w = w.left.right
+					}
+					if (w.left == nil || w.left.isBlack) && (w.right == nil || w.right.isBlack) {
+						w.isBlack = false
+						x = w.parent
+						if x == root || !x.isBlack {
+							x.isBlack = true
+							break
+						}
+						if x == x.parent.left {
+							w = x.parent.right
+						} else {
+							w = x.parent.left
+						}
+					} else {
+						if w.right == nil || w.right.isBlack {
+							w.left.isBlack = true
+							w.isBlack = false
+							rotateRight(w)
+							w = w.parent
+						}
+						w.isBlack = w.parent.isBlack
+						w.parent.isBlack = true
+						w.right.isBlack = true
+						rotateLeft(w.parent)
+						break
+					}
+				} else {
+					if !w.isBlack {
+						w.isBlack = true
+						w.parent.isBlack = false
+						rotateRight(w.parent)
+						if root == w.right {
+							root = w
+						}
+						w = w.right.left
+					}
+					if (w.left == nil || w.left.isBlack) && (w.right == nil || w.right.isBlack) {
+						w.isBlack = false
+						x = w.parent
+						if !x.isBlack || x == root {
+							x.isBlack = true
+							break
+						}
+						if x == x.parent.left {
+							w = x.parent.right
+						} else {
+							w = x.parent.left
+						}
+					} else {
+						if w.left == nil || w.left.isBlack {
+							w.right.isBlack = true
+							w.isBlack = false
+							rotateLeft(w)
+							w = w.parent
+						}
+						w.isBlack = w.parent.isBlack
+						w.parent.isBlack = true
+						w.left.isBlack = true
+						rotateRight(w.parent)
+						break
+					}
+				}
+			}
+		}
+	}
 }
 
 // ForwardIterator represents a position in a tree map.
-// It starts at the one-before-the start position and goes to the end.
+// It starts at the first element and goes to the one-past-the-end position.
 type ForwardIterator struct {
 	tree *TreeMap
 	node *node
-	end  *node
 }
 
-// HasNext reports if we have elements after current position
-func (i ForwardIterator) HasNext() bool { return i.node != i.end }
+// Valid reports if iterator's position is valid
+func (i ForwardIterator) Valid() bool { return i.node != i.tree.endNode }
 
-// Next returns next element from a tree map.
+// Next moves iterator to next element.
 // It panics if goes out of bounds.
-func (i *ForwardIterator) Next() (key Key, value Value) {
-	if i.node == i.end {
+func (i *ForwardIterator) Next() {
+	if i.node == i.tree.endNode {
 		panic("out of bound iteration")
 	}
-	key, value = i.node.key, i.node.value
-	if i.node.right != sentinel {
-		i.node = i.node.right
-		for i.node.left != sentinel {
-			i.node = i.node.left
-		}
-		return
-	}
-	for i.node.parent != nil {
-		parent := i.node.parent
-		if parent.left == i.node {
-			i.node = parent
-			return
-		}
-		i.node = parent
-	}
-	i.node = i.end
-	return
+	i.node = successor(i.node)
 }
 
+// Key returns a key associated with iterator
+func (i ForwardIterator) Key() Key { return i.node.key }
+
+// Value returns a value associated with iterator
+func (i ForwardIterator) Value() Value { return i.node.value }
+
 // ReverseIterator represents a position in a tree map.
-// It starts at the one-past-the-end position and goes to the beginning.
+// It starts at the last element and goes to the one-before-the-start position.
 type ReverseIterator struct {
 	tree *TreeMap
 	node *node
-	end  *node
 }
 
-// HasNext reports if we have elements after current position
-func (i ReverseIterator) HasNext() bool { return i.node != i.end }
+// Valid reports if iterator's position is valid
+func (i ReverseIterator) Valid() bool { return i.node != nil }
 
 // Next returns next element from a tree map
-func (i *ReverseIterator) Next() (key Key, value Value) {
-	if i.node == i.end {
+func (i *ReverseIterator) Next() {
+	if i.node == nil {
 		panic("out of bound iteration")
 	}
-	key, value = i.node.key, i.node.value
-	if i.node.left != i.end {
-		i.node = i.node.left
-		for i.node.right != i.end {
-			i.node = i.node.right
-		}
-		return
-	}
-	for i.node.parent != nil {
-		parent := i.node.parent
-		if parent.right == i.node {
-			i.node = parent
-			return
-		}
-		i.node = parent
-	}
-	i.node = i.end
-	return
+	i.node = predcessor(i.node)
 }
+
+// Key returns a key associated with iterator
+func (i ReverseIterator) Key() Key { return i.node.key }
+
+// Value returns a value associated with iterator
+func (i ReverseIterator) Value() Value { return i.node.value }
