@@ -228,7 +228,7 @@ func successorIntStringTreeMap(x *nodeIntStringTreeMap) *nodeIntStringTreeMap {
 	return x.parent
 }
 
-func predcessorIntStringTreeMap(x *nodeIntStringTreeMap) *nodeIntStringTreeMap {
+func predecessorIntStringTreeMap(x *nodeIntStringTreeMap) *nodeIntStringTreeMap {
 	if x.left != nil {
 		return mostRightIntStringTreeMap(x.left)
 	}
@@ -487,7 +487,7 @@ func (i *reverseIteratorIntStringTreeMap) Next() {
 	if i.node == nil {
 		panic("out of bound iteration")
 	}
-	i.node = predcessorIntStringTreeMap(i.node)
+	i.node = predecessorIntStringTreeMap(i.node)
 }
 
 // Key returns a key associated with iterator

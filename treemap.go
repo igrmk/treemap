@@ -226,7 +226,7 @@ func successor(x *node) *node {
 	return x.parent
 }
 
-func predcessor(x *node) *node {
+func predecessor(x *node) *node {
 	if x.left != nil {
 		return mostRight(x.left)
 	}
@@ -485,7 +485,7 @@ func (i *ReverseIterator) Next() {
 	if i.node == nil {
 		panic("out of bound iteration")
 	}
-	i.node = predcessor(i.node)
+	i.node = predecessor(i.node)
 }
 
 // Key returns a key associated with iterator
