@@ -6,37 +6,34 @@ import (
 )
 
 func BenchmarkSeqSet(b *testing.B) {
+	tr := New(less)
 	for i := 0; i < b.N; i++ {
-		tr := New(less)
 		for j := 0; j < NumIters; j++ {
 			tr.Set(j, "")
 		}
+		tr.Clear()
 	}
 	b.ReportAllocs()
 }
 
 func BenchmarkSeqGet(b *testing.B) {
-	b.StopTimer()
 	tr := New(less)
 	for i := 0; i < NumIters; i++ {
 		tr.Set(i, "")
 	}
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for j := 0; j < NumIters; j++ {
-			tr.Get(j)
-		}
+		tr.Get(i % NumIters)
 	}
 	b.ReportAllocs()
 }
 
 func BenchmarkSeqIter(b *testing.B) {
-	b.StopTimer()
 	tr := New(less)
 	for i := 0; i < NumIters; i++ {
 		tr.Set(i, "")
 	}
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := tr.Iterator(); it.Valid(); it.Next() {
 		}
@@ -44,21 +41,21 @@ func BenchmarkSeqIter(b *testing.B) {
 	b.ReportAllocs()
 }
 
-func randoms() []Key {
-	ks := make([]Key, NumIters)
-	for i := range ks {
-		ks[i] = int(rand.Int63n(NumIters * 100))
+func benchmarksRandomData() ([]Key, int) {
+	keys := make([]Key, NumIters)
+	max := NumIters * 100
+	for i := range keys {
+		keys[i] = int(rand.Int63n(int64(max)))
 	}
-	return ks
+	return keys, max
 }
 
 func BenchmarkRndSet(b *testing.B) {
-	b.StopTimer()
-	ks := randoms()
+	keys, _ := benchmarksRandomData()
 	tr := New(less)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, k := range ks {
+		for _, k := range keys {
 			tr.Set(k, "")
 		}
 		tr.Clear()
@@ -67,29 +64,25 @@ func BenchmarkRndSet(b *testing.B) {
 }
 
 func BenchmarkRndGet(b *testing.B) {
-	b.StopTimer()
 	tr := New(less)
-	ks := randoms()
-	for _, k := range ks {
+	keys, max := benchmarksRandomData()
+	for _, k := range keys {
 		tr.Set(k, "")
 	}
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		for _, k := range ks {
-			tr.Get(k)
-		}
+		tr.Get(i % max)
 	}
 	b.ReportAllocs()
 }
 
 func BenchmarkRndIter(b *testing.B) {
-	b.StopTimer()
 	tr := New(less)
-	ks := randoms()
-	for _, k := range ks {
+	keys, _ := benchmarksRandomData()
+	for _, k := range keys {
 		tr.Set(k, "")
 	}
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for it := tr.Iterator(); it.Valid(); it.Next() {
 		}

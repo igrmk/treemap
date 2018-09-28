@@ -8,14 +8,18 @@ import (
 	"testing"
 )
 
+type Key = int
+type Value = string
+type TreeMap = intStringTreeMap
+
 const NumIters = 10000
 const RandMax = 40
 
-func min(kv map[int]string) int {
+func min(kv map[Key]Value) Key {
 	if len(kv) == 0 {
 		return 0
 	}
-	var key *int
+	var key *Key
 	for k := range kv {
 		if key == nil || k < *key {
 			t := k
@@ -25,11 +29,11 @@ func min(kv map[int]string) int {
 	return *key
 }
 
-func max(kv map[int]string) int {
+func max(kv map[Key]Value) Key {
 	if len(kv) == 0 {
 		return 0
 	}
-	var key *int
+	var key *Key
 	for k := range kv {
 		if key == nil || k > *key {
 			t := k
@@ -40,11 +44,11 @@ func max(kv map[int]string) int {
 }
 
 type pair struct {
-	k int
-	v string
+	k Key
+	v Value
 }
 
-func randomData() []pair {
+func testRandomData() []pair {
 	var kv []pair
 	for i := 0; i < NumIters; i++ {
 		k := int(rand.Int63n(RandMax))
@@ -54,7 +58,7 @@ func randomData() []pair {
 	return kv
 }
 
-func testKeys(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
+func testKeys(t *testing.T, mp map[Key]Value, tr *TreeMap) {
 	var gotKeys []int
 	for it := tr.Iterator(); it.Valid(); it.Next() {
 		gotKeys = append(gotKeys, it.Key())
@@ -71,9 +75,9 @@ func testKeys(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
 	}
 }
 
-func testMinMax(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
+func testMinMax(t *testing.T, mp map[Key]Value, tr *TreeMap) {
 	exp := min(mp)
-	var got int
+	var got Key
 	if it := tr.Iterator(); it.Valid() {
 		got = it.Key()
 	}
@@ -91,7 +95,7 @@ func testMinMax(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
 	}
 }
 
-func testReverse(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
+func testReverse(t *testing.T, mp map[Key]Value, tr *TreeMap) {
 	for it := tr.Reverse(); it.Valid(); it.Next() {
 		if mp[it.Key()] != it.Value() {
 			t.Errorf("wrong value, expected %s, got %s", mp[it.Key()], it.Value())
@@ -101,8 +105,8 @@ func testReverse(t *testing.T, mp map[int]string, tr *intStringTreeMap) {
 
 func TestRandom(t *testing.T) {
 	tr := newIntStringTreeMap(less)
-	mp := make(map[int]string)
-	kvs := randomData()
+	mp := make(map[Key]Value)
+	kvs := testRandomData()
 	for i, kv := range kvs {
 		k, v := kv.k, kv.v
 		exp, expOK := mp[k]

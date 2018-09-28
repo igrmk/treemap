@@ -42,7 +42,7 @@ type pair struct {
 	v interface{}
 }
 
-func randomData() []pair {
+func testRandomData() []pair {
 	var kv []pair
 	for i := 0; i < NumIters; i++ {
 		k := int(rand.Int63n(RandMax))
@@ -100,7 +100,7 @@ func testReverse(t *testing.T, mp map[Key]Value, tr *TreeMap) {
 func TestRandom(t *testing.T) {
 	tr := New(less)
 	mp := make(map[Key]Value)
-	kvs := randomData()
+	kvs := testRandomData()
 	for i, kv := range kvs {
 		k, v := kv.k, kv.v
 		exp, expOK := mp[k]
