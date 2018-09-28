@@ -35,7 +35,7 @@ func main() {
 	tr.Set(0, "Hello")
 	tr.Set(1, "World")
 
-	for it := tr.Iterator(); it.HasNext(); it.Next() {
+	for it := tr.Iterator(); it.Valid(); it.Next() {
 		fmt.Println(it.Key(), it.Value())
 	}
 }
