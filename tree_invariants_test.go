@@ -6,7 +6,6 @@ func treeSubInvariant(x *node) int {
 		return 1
 	}
 	if x.left != nil && x.left.parent != x {
-
 		return 0
 	}
 	if x.right != nil && x.right.parent != x {
