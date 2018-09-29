@@ -36,7 +36,8 @@ type TreeMap struct {
 	endNode   *node
 	beginNode *node
 	count     int
-	Less      func(Key, Key) bool
+	// Less returns a < b
+	Less func(a Key, b Key) bool
 }
 
 type node struct {

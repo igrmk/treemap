@@ -36,7 +36,8 @@ type intStringTreeMap struct {
 	endNode   *nodeIntStringTreeMap
 	beginNode *nodeIntStringTreeMap
 	count     int
-	Less      func(int, int) bool
+	// Less returns a < b
+	Less func(a int, b int) bool
 }
 
 type nodeIntStringTreeMap struct {
