@@ -7,14 +7,13 @@ TreeMap
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
 [![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
 
-Generic `TreeMap` uses red-black tree under the hood.
+`TreeMap` is a generic sorted map that uses red-black tree under the hood.
 This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
-You can use it as a template to generate `TreeMap` with specific `Key` and `Value` types.
-See example folder for an illustration of generating `TreeMap` with `int` key and `string` value.
+You can use it as a template to generate sorted map with specific key and value types.
+See example folder for an illustration of generating a map with `int` key and `string` value.
 The package is useful without generation as well.
-It uses `interface{}` for both key and value in this case.
+It uses `interface{}` for both a key and a value in this case.
 Iterators are designed after C++. This design works well in Go.
-This data structure is not thread safe.
 
 ### Usage
 
@@ -49,8 +48,6 @@ Command `go generate` will generate a file `gotemplate_intStringTreeMap.go` in t
 This file will contain ready to use tree map.
 
 ### Install
-
-Get or update
 
 ```bash
 go get github.com/ncw/gotemplate/...
