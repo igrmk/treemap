@@ -132,7 +132,8 @@ func (t *TreeMap) Get(id Key) (Value, bool) {
 // Complexity: O(log N)
 func (t *TreeMap) Contains(id Key) bool { return t.findNode(id) != nil }
 
-// Range returns an iterator that goes through all the keys in the range [from, to].
+// Range returns a pair of iterators that you can use to go through all the keys in the range [from, to].
+// More specifically it returns iterators pointing to lower bound and upper bound.
 // Complexity: O(log N).
 func (t *TreeMap) Range(from, to Key) (ForwardIterator, ForwardIterator) {
 	lower := t.LowerBound(from)
@@ -140,7 +141,8 @@ func (t *TreeMap) Range(from, to Key) (ForwardIterator, ForwardIterator) {
 	return ForwardIterator{tree: t, node: lower.node}, ForwardIterator{tree: t, node: upper.node}
 }
 
-// LowerBound returns an iterator such that it goes through all the keys in the range [key, max(key)] by analogy with C++.
+// LowerBound returns an iterator pointing to lower bound.
+// It goes through all the keys in the range [key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 	result := t.endNode
@@ -166,7 +168,8 @@ func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 	}
 }
 
-// UpperBound returns an iterator such that it goes through all the keys in the range (key, max(key)] by analogy with C++.
+// UpperBound returns an iterator pointing to upper bound.
+// It goes through all the keys in the range (key, max(key)] by analogy with C++.
 // Complexity: O(log N).
 func (t *TreeMap) UpperBound(key Key) ForwardIterator {
 	result := t.endNode

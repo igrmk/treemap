@@ -85,3 +85,16 @@ func ExampleTreeMap_Reverse() {
 	// 2 - two
 	// 1 - one
 }
+
+func ExampleTreeMap_Range() {
+	tr := New(less)
+	tr.Set(1, "one")
+	tr.Set(2, "two")
+	tr.Set(3, "three")
+	for it, end := tr.Range(1, 2); it != end; it.Next() {
+		fmt.Println(it.Key(), "-", it.Value())
+	}
+	// Output:
+	// 1 - one
+	// 2 - two
+}
