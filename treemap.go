@@ -1,3 +1,26 @@
+// Package treemap provides generic map that uses red-black tree under the hood.
+// You can use it as a template to generate a tree map with specific key and value types.
+// Iterators are designed after C++.
+//
+// Example:
+//
+//     package main
+//
+//     import "fmt"
+//
+//     //go:generate gotemplate "github.com/ncw/gotemplate/treemap" "intStringTreeMap(int, string)"
+//
+//     func less(x, y int) bool { return x < y }
+//
+//     func main() {
+//         tr := newIntStringTreeMap(less)
+//         tr.Set(0, "Hello")
+//         tr.Set(1, "World")
+//
+//         for it := tr.Iterator(); it.Valid(); it.Next() {
+//             fmt.Println(it.Key(), it.Value())
+//         }
+//     }
 package treemap
 
 // template type TreeMap(Key, Value)
