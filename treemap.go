@@ -491,6 +491,15 @@ func (i *ForwardIterator) Next() {
 	i.node = successor(i.node)
 }
 
+// Prev moves iterator to previous element.
+// It panics if goes out of bounds.
+func (i *ForwardIterator) Prev() {
+	i.node = predecessor(i.node)
+	if i.node == nil {
+		panic("out of bound iteration")
+	}
+}
+
 // Key returns a key associated with iterator
 func (i ForwardIterator) Key() Key { return i.node.key }
 
@@ -513,6 +522,19 @@ func (i *ReverseIterator) Next() {
 		panic("out of bound iteration")
 	}
 	i.node = predecessor(i.node)
+}
+
+// Prev moves iterator to previous element.
+// It panics if goes out of bounds.
+func (i *ReverseIterator) Prev() {
+	if i.node != nil {
+		i.node = successor(i.node)
+	} else {
+		i.node = i.tree.beginNode
+	}
+	if i.node == i.tree.endNode {
+		panic("out of bound iteration")
+	}
 }
 
 // Key returns a key associated with iterator

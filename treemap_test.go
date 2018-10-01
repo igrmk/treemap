@@ -294,9 +294,30 @@ func TestIteration(t *testing.T) {
 			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
 		}
 	}
+	reverse := tr.Reverse()
+	for ; reverse.Valid(); reverse.Next() {
+	}
+	rbegin := tr.Reverse()
+	for it := reverse; it != rbegin; {
+		it.Prev()
+		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
+			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
+		}
+		count++
+	}
+	forward := tr.Iterator()
+	for ; forward.Valid(); forward.Next() {
+	}
+	for it := forward; it != tr.Iterator(); {
+		it.Prev()
+		count--
+		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
+			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
+		}
+	}
 }
 
-func TestOutOfBoundsIteration(t *testing.T) {
+func TestOutOfBoundsForwardIterationNext(t *testing.T) {
 	tr := New(less)
 	tr.Set(0, "a")
 	tr.Set(1, "b")
@@ -304,8 +325,7 @@ func TestOutOfBoundsIteration(t *testing.T) {
 	tr.Set(3, "d")
 	tr.Set(4, "e")
 	it := tr.Iterator()
-	for it.Valid() {
-		it.Next()
+	for ; it.Valid(); it.Next() {
 	}
 	defer func() {
 		if r := recover(); r == nil {
@@ -313,6 +333,56 @@ func TestOutOfBoundsIteration(t *testing.T) {
 		}
 	}()
 	it.Next()
+}
+
+func TestOutOfBoundsForwardIterationPrev(t *testing.T) {
+	tr := New(less)
+	tr.Set(0, "a")
+	tr.Set(1, "b")
+	tr.Set(2, "c")
+	tr.Set(3, "d")
+	tr.Set(4, "e")
+	it := tr.Iterator()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("should have panicked!")
+		}
+	}()
+	it.Prev()
+}
+
+func TestOutOfBoundsReverseIterationNext(t *testing.T) {
+	tr := New(less)
+	tr.Set(0, "a")
+	tr.Set(1, "b")
+	tr.Set(2, "c")
+	tr.Set(3, "d")
+	tr.Set(4, "e")
+	it := tr.Reverse()
+	for ; it.Valid(); it.Next() {
+	}
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("should have panicked!")
+		}
+	}()
+	it.Next()
+}
+
+func TestOutOfBoundsReverseIterationPrev(t *testing.T) {
+	tr := New(less)
+	tr.Set(0, "a")
+	tr.Set(1, "b")
+	tr.Set(2, "c")
+	tr.Set(3, "d")
+	tr.Set(4, "e")
+	it := tr.Reverse()
+	defer func() {
+		if r := recover(); r == nil {
+			t.Error("should have panicked!")
+		}
+	}()
+	it.Prev()
 }
 
 func TestRangeSingle(t *testing.T) {
