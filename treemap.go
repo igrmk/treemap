@@ -1,4 +1,4 @@
-// Package treemap provides generic map that uses red-black tree under the hood.
+// Package treemap provides generic sorted map that uses red-black tree under the hood.
 // You can use it as a template to generate a tree map with specific key and value types.
 // Iterators are designed after C++.
 //
