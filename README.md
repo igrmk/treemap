@@ -13,7 +13,7 @@ You can use it as a template to generate sorted map with specific key and value 
 See example folder for an illustration of generating a map with `int` key and `string` value.
 The package is useful without generation as well.
 It uses `interface{}` for both a key and a value in this case.
-Iterators are designed after C++. This design works well in Go.
+Iterators are designed after C++.
 
 ### Usage
 
