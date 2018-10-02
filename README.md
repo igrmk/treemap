@@ -56,18 +56,18 @@ go get github.com/igrmk/treemap
 
 ### Complexity
 
-| Name        | Time      |
-|:-----------:|:---------:|
-| `Set`       | O(log*N*) |
-| `Del`       | O(log*N*) |
-| `Get`       | O(log*N*) |
-| `Contains`  | O(log*N*) |
-| `Count`     | O(1)      |
-| `Clear`     | O(1)      |
-| `Range`     | O(log*N*) |
-| `Iterator`  | O(1)      |
-| `Reverse`   | O(log*N*) |
-| Iteration   | O(*N*)    |
+| Name       | Time      |
+|:----------:|:---------:|
+| `Set`      | O(log*N*) |
+| `Del`      | O(log*N*) |
+| `Get`      | O(log*N*) |
+| `Contains` | O(log*N*) |
+| `Len`      | O(1)      |
+| `Clear`    | O(1)      |
+| `Range`    | O(log*N*) |
+| `Iterator` | O(1)      |
+| `Reverse`  | O(log*N*) |
+| Iteration  | O(*N*)    |
 
 ### Memory usage
 

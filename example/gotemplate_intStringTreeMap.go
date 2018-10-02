@@ -56,9 +56,9 @@ func newIntStringTreeMap(less func(a int, b int) bool) *intStringTreeMap {
 	return &intStringTreeMap{beginNode: endNode, endNode: endNode, Less: less}
 }
 
-// Count returns total count of elements in a map.
+// Len returns total count of elements in a map.
 // Complexity: O(1).
-func (t *intStringTreeMap) Count() int { return t.count }
+func (t *intStringTreeMap) Len() int { return t.count }
 
 // Set sets the value and silently overrides previous value if it exists.
 // Complexity: O(log N).

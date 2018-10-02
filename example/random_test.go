@@ -122,8 +122,8 @@ func TestRandom(t *testing.T) {
 			tr.Del(k)
 		}
 
-		if len(mp) != tr.Count() {
-			t.Errorf("wrong count, expected %d, got %d", len(mp), tr.Count())
+		if len(mp) != tr.Len() {
+			t.Errorf("wrong count, expected %d, got %d", len(mp), tr.Len())
 			return
 		}
 

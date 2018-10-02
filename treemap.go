@@ -56,9 +56,9 @@ func New(less func(a Key, b Key) bool) *TreeMap {
 	return &TreeMap{beginNode: endNode, endNode: endNode, Less: less}
 }
 
-// Count returns total count of elements in a map.
+// Len returns total count of elements in a map.
 // Complexity: O(1).
-func (t *TreeMap) Count() int { return t.count }
+func (t *TreeMap) Len() int { return t.count }
 
 // Set sets the value and silently overrides previous value if it exists.
 // Complexity: O(log N).

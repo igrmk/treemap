@@ -8,7 +8,7 @@ func value(x string) string { return x }
 
 func TestNew(t *testing.T) {
 	tr := newIntStringTreeMap(less)
-	if tr.Count() != 0 {
+	if tr.Len() != 0 {
 		t.Error("count should be zero")
 	}
 	if tr.endNode.left != nil {
@@ -26,8 +26,8 @@ func TestSet(t *testing.T) {
 	if v := tr.endNode.left.value; v != x {
 		t.Errorf("wrong returned value, expected '%s', got '%s'", x, v)
 	}
-	if tr.Count() != 1 {
-		t.Errorf("wrong count, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
 }
 
@@ -35,8 +35,8 @@ func TestDel(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	tr.Set(0, "x")
 	tr.Del(0)
-	if tr.Count() != 0 {
-		t.Errorf("wrong count after deletion, expected 0, got %d", tr.Count())
+	if tr.Len() != 0 {
+		t.Errorf("wrong count after deletion, expected 0, got %d", tr.Len())
 	}
 	if tr.endNode.left != nil {
 		t.Error("wrong tree state after deletion")
@@ -51,14 +51,14 @@ func TestGet(t *testing.T) {
 	if v != x || !ok {
 		t.Errorf("wrong returned value, expected 'x', got '%s'", v)
 	}
-	if tr.Count() != 1 {
-		t.Errorf("wrong count, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
 	if v, ok := tr.Get(2); v != "" || ok {
 		t.Errorf("wrong returned value, expected nil, got '%v'", v)
 	}
-	if tr.Count() != 1 {
-		t.Errorf("wrong count, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
 }
 
@@ -75,26 +75,26 @@ func TestContains(t *testing.T) {
 	}
 }
 
-func TestCount(t *testing.T) {
+func TestLen(t *testing.T) {
 	tr := newIntStringTreeMap(less)
-	if tr.Count() != 0 {
-		t.Errorf("wrong count, expected 0, got %d", tr.Count())
+	if tr.Len() != 0 {
+		t.Errorf("wrong count, expected 0, got %d", tr.Len())
 	}
 	tr.Set(0, "x")
-	if tr.Count() != 1 {
-		t.Errorf("wrong count, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
 	tr.Set(1, "x")
-	if tr.Count() != 2 {
-		t.Errorf("wrong count, expected 2, got %d", tr.Count())
+	if tr.Len() != 2 {
+		t.Errorf("wrong count, expected 2, got %d", tr.Len())
 	}
 	tr.Del(1)
-	if tr.Count() != 1 {
-		t.Errorf("wrong count, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
 	tr.Del(0)
-	if tr.Count() != 0 {
-		t.Errorf("wrong count, expected 0, got %d", tr.Count())
+	if tr.Len() != 0 {
+		t.Errorf("wrong count, expected 0, got %d", tr.Len())
 	}
 }
 
@@ -104,7 +104,7 @@ func TestClear(t *testing.T) {
 	tr.Set(1, "y")
 	tr.Set(2, "z")
 	tr.Clear()
-	if tr.Count() != 0 {
+	if tr.Len() != 0 {
 		t.Error("count is not zero")
 	}
 	if tr.endNode.left != nil {
@@ -259,8 +259,8 @@ func TestDelNil(t *testing.T) {
 	tr := newIntStringTreeMap(less)
 	tr.Set(0, value(x))
 	tr.Del(1)
-	if tr.Count() != 1 {
-		t.Errorf("wrong count after del, expected 1, got %d", tr.Count())
+	if tr.Len() != 1 {
+		t.Errorf("wrong count after del, expected 1, got %d", tr.Len())
 	}
 }
 

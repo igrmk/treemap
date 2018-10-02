@@ -39,11 +39,11 @@ func ExampleTreeMap_Contains() {
 	// true
 }
 
-func ExampleTreeMap_Count() {
+func ExampleTreeMap_Len() {
 	tr := New(less)
 	tr.Set(0, "hello")
 	tr.Set(1, "world")
-	fmt.Println(tr.Count())
+	fmt.Println(tr.Len())
 	// Output:
 	// 2
 }
@@ -53,7 +53,7 @@ func ExampleTreeMap_Clear() {
 	tr.Set(0, "hello")
 	tr.Set(1, "world")
 	tr.Clear()
-	fmt.Println(tr.Count())
+	fmt.Println(tr.Len())
 	// Output:
 	// 0
 }
