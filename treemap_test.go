@@ -281,39 +281,33 @@ func TestIteration(t *testing.T) {
 	for _, kv := range kvs {
 		tr.Set(kv.key, kv.value)
 	}
-	count := 0
-	for it := tr.Iterator(); it.Valid(); it.Next() {
-		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
+	assert := func(expKey Key, expValue Value, gotKey Key, gotValue Value) {
+		if expKey != gotKey || expValue != gotValue {
+			t.Errorf("expected %v, %s, got %v, %s", expKey, expValue, gotKey, gotValue)
 		}
+	}
+	count := 0
+	fwd := tr.Iterator()
+	for ; fwd.Valid(); fwd.Next() {
+		assert(kvs[count].key, kvs[count].value, fwd.Key(), fwd.Value())
 		count++
 	}
-	for it := tr.Reverse(); it.Valid(); it.Next() {
+	for fwd != tr.Iterator() {
+		fwd.Prev()
 		count--
-		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
-		}
+		assert(kvs[count].key, kvs[count].value, fwd.Key(), fwd.Value())
 	}
-	reverse := tr.Reverse()
-	for ; reverse.Valid(); reverse.Next() {
+	count = len(kvs)
+	rev := tr.Reverse()
+	for ; rev.Valid(); rev.Next() {
+		count--
+		assert(kvs[count].key, kvs[count].value, rev.Key(), rev.Value())
 	}
 	rbegin := tr.Reverse()
-	for it := reverse; it != rbegin; {
-		it.Prev()
-		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
-		}
+	for rev != rbegin {
+		rev.Prev()
+		assert(kvs[count].key, kvs[count].value, rev.Key(), rev.Value())
 		count++
-	}
-	forward := tr.Iterator()
-	for ; forward.Valid(); forward.Next() {
-	}
-	for it := forward; it != tr.Iterator(); {
-		it.Prev()
-		count--
-		if kvs[count].key != it.Key() || kvs[count].value != it.Value() {
-			t.Errorf("expected %v, %s, got %v, %s", kvs[count].key, kvs[count].value, it.Key(), it.Value())
-		}
 	}
 }
 
