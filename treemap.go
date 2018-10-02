@@ -1,5 +1,5 @@
-// Package treemap provides generic sorted map that uses red-black tree under the hood.
-// You can use it as a template to generate a tree map with specific key and value types.
+// Package treemap provides a generic key-sorted map. It uses red-black tree under the hood.
+// You can use it as a template to generate a sorted map with specific key and value types.
 // Iterators are designed after C++.
 //
 // Example:
@@ -473,16 +473,18 @@ func removeNode(root *node, z *node) {
 }
 
 // ForwardIterator represents a position in a tree map.
-// It starts at the first element and goes to the one-past-the-end position.
+// It is designed to iterate a map in a forward order.
+// It can point to any position from the first element to the one-past-the-end element.
 type ForwardIterator struct {
 	tree *TreeMap
 	node *node
 }
 
-// Valid reports if iterator's position is valid
+// Valid reports if an iterator's position is valid.
+// In other words it returns true if an iterator is not at the one-past-the-end position.
 func (i ForwardIterator) Valid() bool { return i.node != i.tree.endNode }
 
-// Next moves iterator to next element.
+// Next moves an iterator to the next element.
 // It panics if goes out of bounds.
 func (i *ForwardIterator) Next() {
 	if i.node == i.tree.endNode {
@@ -491,7 +493,7 @@ func (i *ForwardIterator) Next() {
 	i.node = successor(i.node)
 }
 
-// Prev moves iterator to previous element.
+// Prev moves an iterator to the previous element.
 // It panics if goes out of bounds.
 func (i *ForwardIterator) Prev() {
 	i.node = predecessor(i.node)
@@ -500,23 +502,26 @@ func (i *ForwardIterator) Prev() {
 	}
 }
 
-// Key returns a key associated with iterator
+// Key returns a key at an iterator's position
 func (i ForwardIterator) Key() Key { return i.node.key }
 
-// Value returns a value associated with iterator
+// Value returns a value at an iterator's position
 func (i ForwardIterator) Value() Value { return i.node.value }
 
 // ReverseIterator represents a position in a tree map.
-// It starts at the last element and goes to the one-before-the-start position.
+// It is designed to iterate a map in a reverse order.
+// It can point to any position from the one-before-the-start element to the last element.
 type ReverseIterator struct {
 	tree *TreeMap
 	node *node
 }
 
-// Valid reports if iterator's position is valid
+// Valid reports if an iterator's position is valid.
+// In other words it returns true if an iterator is not at the one-before-the-start position.
 func (i ReverseIterator) Valid() bool { return i.node != nil }
 
-// Next returns next element from a tree map
+// Next moves an iterator to the next element in reverse order.
+// It panics if goes out of bounds.
 func (i *ReverseIterator) Next() {
 	if i.node == nil {
 		panic("out of bound iteration")
@@ -524,7 +529,7 @@ func (i *ReverseIterator) Next() {
 	i.node = predecessor(i.node)
 }
 
-// Prev moves iterator to previous element.
+// Prev moves an iterator to the previous element in reverse order.
 // It panics if goes out of bounds.
 func (i *ReverseIterator) Prev() {
 	if i.node != nil {
@@ -537,8 +542,8 @@ func (i *ReverseIterator) Prev() {
 	}
 }
 
-// Key returns a key associated with iterator
+// Key returns a key at an iterator's position
 func (i ReverseIterator) Key() Key { return i.node.key }
 
-// Value returns a value associated with iterator
+// Value returns a value at an iterator's position
 func (i ReverseIterator) Value() Value { return i.node.value }
