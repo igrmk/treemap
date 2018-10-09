@@ -8,7 +8,7 @@
 //
 //     import "fmt"
 //
-//     //go:generate gotemplate "github.com/ncw/gotemplate/treemap" "intStringTreeMap(int, string)"
+//     //go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
 //
 //     func less(x, y int) bool { return x < y }
 //
