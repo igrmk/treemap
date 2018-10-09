@@ -140,8 +140,7 @@ func (t *intStringTreeMap) Range(from, to int) (forwardIteratorIntStringTreeMap,
 	return t.LowerBound(from), t.UpperBound(to)
 }
 
-// LowerBound returns an iterator pointing to lower bound.
-// It goes through all the keys in the range [key, max(key)] by analogy with C++.
+// LowerBound returns an iterator pointing to the first element that is not less than the given key.
 // Complexity: O(log N).
 func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 	result := t.endNode
@@ -167,8 +166,7 @@ func (t *intStringTreeMap) LowerBound(key int) forwardIteratorIntStringTreeMap {
 	}
 }
 
-// UpperBound returns an iterator pointing to upper bound.
-// It goes through all the keys in the range (key, max(key)] by analogy with C++.
+// UpperBound returns an iterator pointing to the first element that is greater than the given key.
 // Complexity: O(log N).
 func (t *intStringTreeMap) UpperBound(key int) forwardIteratorIntStringTreeMap {
 	result := t.endNode
