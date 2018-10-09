@@ -137,9 +137,7 @@ func (t *TreeMap) Contains(id Key) bool { return t.findNode(id) != nil }
 // More specifically it returns iterators pointing to lower bound and upper bound.
 // Complexity: O(log N).
 func (t *TreeMap) Range(from, to Key) (ForwardIterator, ForwardIterator) {
-	lower := t.LowerBound(from)
-	upper := t.UpperBound(to)
-	return ForwardIterator{tree: t, node: lower.node}, ForwardIterator{tree: t, node: upper.node}
+	return t.LowerBound(from), t.UpperBound(to)
 }
 
 // LowerBound returns an iterator pointing to lower bound.
