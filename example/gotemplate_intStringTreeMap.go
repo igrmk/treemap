@@ -342,6 +342,7 @@ func (t *intStringTreeMap) insertFixup(x *nodeIntStringTreeMap) {
 }
 
 // nolint: gocyclo
+//noinspection GoNilness
 func removeNodeIntStringTreeMap(root *nodeIntStringTreeMap, z *nodeIntStringTreeMap) {
 	var y *nodeIntStringTreeMap
 	if z.left == nil || z.right == nil {

@@ -15,6 +15,7 @@ type TreeMap = intStringTreeMap
 const NumIters = 10000
 const RandMax = 40
 
+//noinspection GoNilness
 func min(kv map[Key]Value) Key {
 	if len(kv) == 0 {
 		return 0
@@ -29,6 +30,7 @@ func min(kv map[Key]Value) Key {
 	return *key
 }
 
+//noinspection GoNilness
 func max(kv map[Key]Value) Key {
 	if len(kv) == 0 {
 		return 0

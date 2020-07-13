@@ -340,6 +340,7 @@ func (t *TreeMap) insertFixup(x *node) {
 }
 
 // nolint: gocyclo
+//noinspection GoNilness
 func removeNode(root *node, z *node) {
 	var y *node
 	if z.left == nil || z.right == nil {

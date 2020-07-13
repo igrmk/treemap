@@ -113,7 +113,8 @@ func TestClear(t *testing.T) {
 }
 
 func testRange(t *testing.T, it, end forwardIteratorIntStringTreeMap, exp []string) {
-	var got []string
+	//noinspection GoPreferNilSlice
+	got := []string{}
 	for ; it != end; it.Next() {
 		got = append(got, it.Value())
 	}

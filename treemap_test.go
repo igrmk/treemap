@@ -115,7 +115,8 @@ func TestClear(t *testing.T) {
 }
 
 func testRange(t *testing.T, it, end ForwardIterator, exp []Value) {
-	var got []Value
+	//noinspection GoPreferNilSlice
+	got := []Value{}
 	for ; it != end; it.Next() {
 		got = append(got, it.Value())
 	}

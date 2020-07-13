@@ -34,6 +34,7 @@ func graphvizEdges(node *node) string {
 }
 
 // nolint: megacheck
+//noinspection GoUnusedFunction
 func graphviz(node *node) string {
 	return "digraph {\nnode [style=filled]\n" + graphvizNodes(node) + graphvizEdges(node) + "}\n"
 }
