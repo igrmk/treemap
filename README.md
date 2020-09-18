@@ -1,7 +1,7 @@
 TreeMap
 =======
 
-This is obsolete repository now. It is fully merged into [gotemplate](https://github.com/ncw/gotemplate).
+This repository is fully merged into [gotemplate](https://github.com/ncw/gotemplate).
 
 [![GoDoc](https://godoc.org/github.com/igrmk/treemap?status.svg)](https://godoc.org/github.com/igrmk/treemap)
 [![WTFPL License](https://img.shields.io/badge/license-wtfpl-blue.svg)](http://www.wtfpl.net/about/)
