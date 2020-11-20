@@ -3,7 +3,7 @@ TreeMap
 
 This repository is fully merged into [gotemplate](https://github.com/ncw/gotemplate).
 
-[![GoDoc](https://godoc.org/github.com/igrmk/treemap?status.svg)](https://godoc.org/github.com/igrmk/treemap)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/igrmk/treemap)](https://pkg.go.dev/github.com/igrmk/treemap)
 [![Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 [![Build Status](https://travis-ci.org/igrmk/treemap.svg?branch=master)](https://travis-ci.org/igrmk/treemap)
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
