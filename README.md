@@ -4,7 +4,7 @@ TreeMap
 This repository is fully merged into [gotemplate](https://github.com/ncw/gotemplate).
 
 [![GoDoc](https://godoc.org/github.com/igrmk/treemap?status.svg)](https://godoc.org/github.com/igrmk/treemap)
-[![WTFPL License](https://img.shields.io/badge/license-wtfpl-blue.svg)](http://www.wtfpl.net/about/)
+[![Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
 [![Build Status](https://travis-ci.org/igrmk/treemap.svg?branch=master)](https://travis-ci.org/igrmk/treemap)
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
 [![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
@@ -79,8 +79,7 @@ TreeMap uses O(*N*) memory.
 
 Copyright &copy; 2018 Igor Mikushkin &lt;igor.mikushkin@gmail.com&gt;.
 This work is free. You can redistribute it and/or modify it under the
-terms of the Do What The Fuck You Want To Public License, Version 2,
-as published by Sam Hocevar. See the LICENSE file for more details.
+terms of the Unlicense. See the LICENSE file for more details.
 
 ### Thanks to
 
