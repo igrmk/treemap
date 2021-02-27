@@ -2,6 +2,7 @@ TreeMap
 =======
 
 This repository is fully merged into [gotemplate](https://github.com/ncw/gotemplate).
+However, if you just need an untyped tree map, it is easier to use this repository.
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/igrmk/treemap)](https://pkg.go.dev/github.com/igrmk/treemap)
 [![Unlicense](https://img.shields.io/badge/license-Unlicense-brightgreen.svg)](http://unlicense.org/)
