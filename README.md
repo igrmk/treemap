@@ -8,7 +8,7 @@ However, if you just need an untyped tree map, it is easier to use this reposito
 [![Unlicense](https://img.shields.io/badge/license-Unlicense-brightgreen.svg)](http://unlicense.org/)
 [![Build Status](https://travis-ci.org/igrmk/treemap.svg?branch=master)](https://travis-ci.org/igrmk/treemap)
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/r/igrmk/treemap?branch=master)
-[![GoReportCard](http://goreportcard.com/badge/igrmk/treemap)](http://goreportcard.com/report/igrmk/treemap)
+[![GoReportCard](https://goreportcard.com/badge/igrmk/treemap)](https://goreportcard.com/report/igrmk/treemap)
 
 `TreeMap` is a generic key-sorted map. It uses red-black tree under the hood.
 This is [gotemplate](https://github.com/ncw/gotemplate) ready package.
