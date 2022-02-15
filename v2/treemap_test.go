@@ -4,12 +4,99 @@ import (
 	"testing"
 )
 
-func less(x, y Key) bool { return x.(int) < y.(int) }
-
-func value(x string) Value { return Value(x) }
+func less(x, y int) bool { return x < y }
 
 func TestNew(t *testing.T) {
-	tr := New(less)
+	testNew(t, New[int, string]())
+	testNew(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestSet(t *testing.T) {
+	testSet(t, New[int, string]())
+	testSet(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestDel(t *testing.T) {
+	testDel(t, New[int, string]())
+	testDel(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestGet(t *testing.T) {
+	testGet(t, New[int, string]())
+	testGet(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestContains(t *testing.T) {
+	testContains(t, New[int, string]())
+	testContains(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestLen(t *testing.T) {
+	testLen(t, New[int, string]())
+	testLen(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestClear(t *testing.T) {
+	testClear(t, New[int, string]())
+	testClear(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestRange(t *testing.T) {
+	testRange(t, New[int, string]())
+	testRange(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestLowerBound(t *testing.T) {
+	testLowerBound(t, New[int, string]())
+	testLowerBound(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestUpperBound(t *testing.T) {
+	testUpperBound(t, New[int, string]())
+	testUpperBound(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestEmptyRange(t *testing.T) {
+	testEmptyRange(t, New[int, string]())
+	testEmptyRange(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestDelNil(t *testing.T) {
+	testDelNil(t, New[int, string]())
+	testDelNil(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestIteration(t *testing.T) {
+	testIteration(t, New[int, string]())
+	testIteration(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestOutOfBoundsForwardIterationNext(t *testing.T) {
+	testOutOfBoundsForwardIterationNext(t, New[int, string]())
+	testOutOfBoundsForwardIterationNext(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestOutOfBoundsForwardIterationPrev(t *testing.T) {
+	testOutOfBoundsForwardIterationPrev(t, New[int, string]())
+	testOutOfBoundsForwardIterationPrev(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestOutOfBoundsReverseIterationNext(t *testing.T) {
+	testOutOfBoundsReverseIterationNext(t, New[int, string]())
+	testOutOfBoundsReverseIterationNext(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestOutOfBoundsReverseIterationPrev(t *testing.T) {
+	testOutOfBoundsReverseIterationPrev(t, New[int, string]())
+	testOutOfBoundsReverseIterationPrev(t, NewWithKeyCompare[int, string](less))
+}
+
+func TestRangeSingle(t *testing.T) {
+	testRangeSingle(t, New[int, string]())
+	testRangeSingle(t, NewWithKeyCompare[int, string](less))
+}
+
+func testNew(t *testing.T, tr *TreeMap[int, string]) {
 	if tr.Len() != 0 {
 		t.Error("count should be zero")
 	}
@@ -18,9 +105,8 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestSet(t *testing.T) {
-	x := value("x")
-	tr := New(less)
+func testSet(t *testing.T, tr *TreeMap[int, string]) {
+	x := "x"
 	tr.Set(0, x)
 	if tr.endNode.left.key != 0 {
 		t.Errorf("wrong key, expected 0, got %d", tr.endNode.left.key)
@@ -33,8 +119,7 @@ func TestSet(t *testing.T) {
 	}
 }
 
-func TestDel(t *testing.T) {
-	tr := New(less)
+func testDel(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "x")
 	tr.Del(0)
 	if tr.Len() != 0 {
@@ -45,9 +130,8 @@ func TestDel(t *testing.T) {
 	}
 }
 
-func TestGet(t *testing.T) {
-	x := value("x")
-	tr := New(less)
+func testGet(t *testing.T, tr *TreeMap[int, string]) {
+	x := "x"
 	tr.Set(0, x)
 	v, ok := tr.Get(0)
 	if v != x || !ok {
@@ -56,7 +140,7 @@ func TestGet(t *testing.T) {
 	if tr.Len() != 1 {
 		t.Errorf("wrong count, expected 1, got %d", tr.Len())
 	}
-	if v, ok := tr.Get(2); v != nil || ok {
+	if v, ok := tr.Get(2); v != "" || ok {
 		t.Errorf("wrong returned value, expected nil, got '%v'", v)
 	}
 	if tr.Len() != 1 {
@@ -64,8 +148,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
-func TestContains(t *testing.T) {
-	tr := New(less)
+func testContains(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "x")
 	val := tr.Contains(0)
 	if !val {
@@ -77,8 +160,7 @@ func TestContains(t *testing.T) {
 	}
 }
 
-func TestLen(t *testing.T) {
-	tr := New(less)
+func testLen(t *testing.T, tr *TreeMap[int, string]) {
 	if tr.Len() != 0 {
 		t.Errorf("wrong count, expected 0, got %d", tr.Len())
 	}
@@ -100,8 +182,7 @@ func TestLen(t *testing.T) {
 	}
 }
 
-func TestClear(t *testing.T) {
-	tr := New(less)
+func testClear(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "x")
 	tr.Set(1, "y")
 	tr.Set(2, "z")
@@ -114,37 +195,34 @@ func TestClear(t *testing.T) {
 	}
 }
 
-func testRange(t *testing.T, it, end ForwardIterator, exp []Value) {
-	//noinspection GoPreferNilSlice
-	got := []Value{}
-	for ; it != end; it.Next() {
-		got = append(got, it.Value())
-	}
-	if len(got) != len(exp) {
-		t.Errorf("wrong range length, expected %d, got %d", len(exp), len(got))
-	}
-	for i, v := range exp {
-		if got[i] != v {
-			t.Errorf("wrong value, expected '%s', got '%s'", exp[i], got[i])
-		}
-	}
-}
-
-func TestRange(t *testing.T) {
-	tr := New(less)
+func testRange(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "x")
 	tr.Set(1, "y")
 	tr.Set(2, "z")
 	tr.Set(3, "m")
 	tr.Set(4, "n")
 	it, end := tr.Range(1, 3)
-	testRange(t, it, end, []Value{"y", "z", "m"})
+	testRangeEqual(t, it, end, []string{"y", "z", "m"})
 	it, end = tr.Range(1, 9)
-	testRange(t, it, end, []Value{"y", "z", "m", "n"})
+	testRangeEqual(t, it, end, []string{"y", "z", "m", "n"})
 }
 
-func TestLowerBound(t *testing.T) {
-	tr := New(less)
+func testRangeEqual(t *testing.T, it, end ForwardIterator[int, string], exp []string) {
+	var actual []string
+	for ; it != end; it.Next() {
+		actual = append(actual, it.Value())
+	}
+	if len(actual) != len(exp) {
+		t.Errorf("wrong range length, expected %d, got %d", len(exp), len(actual))
+	}
+	for i, v := range exp {
+		if actual[i] != v {
+			t.Errorf("wrong value, expected '%s', got '%s'", exp[i], actual[i])
+		}
+	}
+}
+
+func testLowerBound(t *testing.T, tr *TreeMap[int, string]) {
 	it := tr.LowerBound(0)
 	if it.Valid() {
 		t.Error("lower bound should not exists")
@@ -192,8 +270,7 @@ func TestLowerBound(t *testing.T) {
 	}
 }
 
-func TestUpperBound(t *testing.T) {
-	tr := New(less)
+func testUpperBound(t *testing.T, tr *TreeMap[int, string]) {
 	it := tr.UpperBound(0)
 	if it.Valid() {
 		t.Error("upper bound should not exists")
@@ -245,8 +322,7 @@ func TestUpperBound(t *testing.T) {
 	}
 }
 
-func TestEmptyRange(t *testing.T) {
-	tr := New(less)
+func testEmptyRange(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "x")
 	tr.Set(1, "y")
 	tr.Set(2, "z")
@@ -257,20 +333,19 @@ func TestEmptyRange(t *testing.T) {
 	}
 }
 
-func TestDelNil(t *testing.T) {
+func testDelNil(t *testing.T, tr *TreeMap[int, string]) {
 	x := "x"
-	tr := New(less)
-	tr.Set(0, value(x))
+	tr.Set(0, x)
 	tr.Del(1)
 	if tr.Len() != 1 {
 		t.Errorf("wrong count after del, expected 1, got %d", tr.Len())
 	}
 }
 
-func TestIteration(t *testing.T) {
+func testIteration(t *testing.T, tr *TreeMap[int, string]) {
 	kvs := []struct {
-		key   Key
-		value Value
+		key   int
+		value string
 	}{
 		{0, "a"},
 		{1, "b"},
@@ -278,11 +353,10 @@ func TestIteration(t *testing.T) {
 		{3, "d"},
 		{4, "e"},
 	}
-	tr := New(less)
 	for _, kv := range kvs {
 		tr.Set(kv.key, kv.value)
 	}
-	assert := func(expKey Key, expValue Value, gotKey Key, gotValue Value) {
+	assert := func(expKey int, expValue string, gotKey int, gotValue string) {
 		if expKey != gotKey || expValue != gotValue {
 			t.Errorf("expected %v, %s, got %v, %s", expKey, expValue, gotKey, gotValue)
 		}
@@ -312,8 +386,7 @@ func TestIteration(t *testing.T) {
 	}
 }
 
-func TestOutOfBoundsForwardIterationNext(t *testing.T) {
-	tr := New(less)
+func testOutOfBoundsForwardIterationNext(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")
@@ -330,8 +403,7 @@ func TestOutOfBoundsForwardIterationNext(t *testing.T) {
 	it.Next()
 }
 
-func TestOutOfBoundsForwardIterationPrev(t *testing.T) {
-	tr := New(less)
+func testOutOfBoundsForwardIterationPrev(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")
@@ -346,8 +418,7 @@ func TestOutOfBoundsForwardIterationPrev(t *testing.T) {
 	it.Prev()
 }
 
-func TestOutOfBoundsReverseIterationNext(t *testing.T) {
-	tr := New(less)
+func testOutOfBoundsReverseIterationNext(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")
@@ -364,8 +435,7 @@ func TestOutOfBoundsReverseIterationNext(t *testing.T) {
 	it.Next()
 }
 
-func TestOutOfBoundsReverseIterationPrev(t *testing.T) {
-	tr := New(less)
+func testOutOfBoundsReverseIterationPrev(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")
@@ -380,8 +450,7 @@ func TestOutOfBoundsReverseIterationPrev(t *testing.T) {
 	it.Prev()
 }
 
-func TestRangeSingle(t *testing.T) {
-	tr := New(less)
+func testRangeSingle(t *testing.T, tr *TreeMap[int, string]) {
 	tr.Set(0, "a")
 	tr.Set(1, "b")
 	tr.Set(2, "c")

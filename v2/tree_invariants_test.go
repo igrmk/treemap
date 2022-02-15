@@ -1,7 +1,7 @@
 package treemap
 
-// nolint: gocyclo
-func treeSubInvariant(x *node) int {
+//nolint:gocyclo
+func treeSubInvariant[Key, Value any](x *node[Key, Value]) int {
 	if x == nil {
 		return 1
 	}
@@ -35,7 +35,7 @@ func treeSubInvariant(x *node) int {
 	return h
 }
 
-func treeInvariant(root *node) bool {
+func treeInvariant[Key, Value any](root *node[Key, Value]) bool {
 	if root == nil {
 		return true
 	}

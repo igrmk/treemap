@@ -1,78 +1,82 @@
-// Package treemap provides a generic key-sorted map. It uses red-black tree under the hood.
-// You can use it as a template to generate a sorted map with specific key and value types.
+// Package treemap provides a generic key-sorted map.
+// It uses red-black tree under the hood.
 // Iterators are designed after C++.
 //
 // Example:
 //
 //     package main
 //
-//     import "fmt"
+//     import (
+//         "fmt"
 //
-//     //go:generate gotemplate "github.com/igrmk/treemap" "intStringTreeMap(int, string)"
-//
-//     func less(x, y int) bool { return x < y }
+//         "github.com/igrmk/treemap/v2"
+//     )
 //
 //     func main() {
-//         tr := newIntStringTreeMap(less)
-//         tr.Set(0, "Hello")
-//         tr.Set(1, "World")
-//
-//         for it := tr.Iterator(); it.Valid(); it.Next() {
+//         tree := treemap.New[int, string]()
+//         tree.Set(1, "World")
+//         tree.Set(0, "Hello")
+//         for it := tree.Iterator(); it.Valid(); it.Next() {
 //             fmt.Println(it.Key(), it.Value())
 //         }
 //     }
+//
+//     // Output:
+//     // 0 Hello
+//     // 1 World
 package treemap
 
-// template type TreeMap(Key, Value)
+import "constraints"
 
-// Key is a generic key type of the map
-type Key interface{}
-
-// Value is a generic value type of the map
-type Value interface{}
-
-// TreeMap is the red-black tree based map
-type TreeMap struct {
-	endNode   *node
-	beginNode *node
-	count     int
-	// Less returns a < b
-	Less func(a Key, b Key) bool
+// TreeMap is the generic red-black tree based map
+type TreeMap[Key, Value any] struct {
+	endNode    *node[Key, Value]
+	beginNode  *node[Key, Value]
+	count      int
+	keyCompare func(a Key, b Key) bool
 }
 
-type node struct {
-	right   *node
-	left    *node
-	parent  *node
+type node[Key, Value any] struct {
+	right   *node[Key, Value]
+	left    *node[Key, Value]
+	parent  *node[Key, Value]
 	isBlack bool
 	key     Key
 	value   Value
 }
 
 // New creates and returns new TreeMap.
-// Parameter less is a function returning a < b.
-func New(less func(a Key, b Key) bool) *TreeMap {
-	endNode := &node{isBlack: true}
-	return &TreeMap{beginNode: endNode, endNode: endNode, Less: less}
+func New[Key constraints.Ordered, Value any]() *TreeMap[Key, Value] {
+	endNode := &node[Key, Value]{isBlack: true}
+	return &TreeMap[Key, Value]{beginNode: endNode, endNode: endNode, keyCompare: defaultKeyCompare[Key]}
+}
+
+// NewWithKeyCompare creates and returns new TreeMap with the specified key compare function.
+// Parameter keyCompare is a function returning a < b.
+func NewWithKeyCompare[Key, Value any](
+	keyCompare func(a, b Key) bool,
+) *TreeMap[Key, Value] {
+	endNode := &node[Key, Value]{isBlack: true}
+	return &TreeMap[Key, Value]{beginNode: endNode, endNode: endNode, keyCompare: keyCompare}
 }
 
 // Len returns total count of elements in a map.
 // Complexity: O(1).
-func (t *TreeMap) Len() int { return t.count }
+func (t *TreeMap[Key, Value]) Len() int { return t.count }
 
 // Set sets the value and silently overrides previous value if it exists.
 // Complexity: O(log N).
-func (t *TreeMap) Set(key Key, value Value) {
+func (t *TreeMap[Key, Value]) Set(key Key, value Value) {
 	parent := t.endNode
 	current := parent.left
 	less := true
 	for current != nil {
 		parent = current
 		switch {
-		case t.Less(key, current.key):
+		case t.keyCompare(key, current.key):
 			current = current.left
 			less = true
-		case t.Less(current.key, key):
+		case t.keyCompare(current.key, key):
 			current = current.right
 			less = false
 		default:
@@ -80,7 +84,7 @@ func (t *TreeMap) Set(key Key, value Value) {
 			return
 		}
 	}
-	x := &node{parent: parent, value: value, key: key}
+	x := &node[Key, Value]{parent: parent, value: value, key: key}
 	if less {
 		parent.left = x
 	} else {
@@ -95,7 +99,7 @@ func (t *TreeMap) Set(key Key, value Value) {
 
 // Del deletes the value.
 // Complexity: O(log N).
-func (t *TreeMap) Del(key Key) {
+func (t *TreeMap[Key, Value]) Del(key Key) {
 	z := t.findNode(key)
 	if z == nil {
 		return
@@ -113,7 +117,7 @@ func (t *TreeMap) Del(key Key) {
 
 // Clear clears the map.
 // Complexity: O(1).
-func (t *TreeMap) Clear() {
+func (t *TreeMap[Key, Value]) Clear() {
 	t.count = 0
 	t.beginNode = t.endNode
 	t.endNode.left = nil
@@ -121,7 +125,7 @@ func (t *TreeMap) Clear() {
 
 // Get retrieves a value from a map for specified key and reports if it exists.
 // Complexity: O(log N).
-func (t *TreeMap) Get(id Key) (Value, bool) {
+func (t *TreeMap[Key, Value]) Get(id Key) (Value, bool) {
 	node := t.findNode(id)
 	if node == nil {
 		node = t.endNode
@@ -131,36 +135,36 @@ func (t *TreeMap) Get(id Key) (Value, bool) {
 
 // Contains checks if key exists in a map.
 // Complexity: O(log N)
-func (t *TreeMap) Contains(id Key) bool { return t.findNode(id) != nil }
+func (t *TreeMap[Key, Value]) Contains(id Key) bool { return t.findNode(id) != nil }
 
 // Range returns a pair of iterators that you can use to go through all the keys in the range [from, to].
 // More specifically it returns iterators pointing to lower bound and upper bound.
 // Complexity: O(log N).
-func (t *TreeMap) Range(from, to Key) (ForwardIterator, ForwardIterator) {
+func (t *TreeMap[Key, Value]) Range(from, to Key) (ForwardIterator[Key, Value], ForwardIterator[Key, Value]) {
 	return t.LowerBound(from), t.UpperBound(to)
 }
 
 // LowerBound returns an iterator pointing to the first element that is not less than the given key.
 // Complexity: O(log N).
-func (t *TreeMap) LowerBound(key Key) ForwardIterator {
+func (t *TreeMap[Key, Value]) LowerBound(key Key) ForwardIterator[Key, Value] {
 	result := t.endNode
 	node := t.endNode.left
 	if node == nil {
-		return ForwardIterator{tree: t, node: t.endNode}
+		return ForwardIterator[Key, Value]{tree: t, node: t.endNode}
 	}
 	for {
-		if t.Less(node.key, key) {
+		if t.keyCompare(node.key, key) {
 			if node.right != nil {
 				node = node.right
 			} else {
-				return ForwardIterator{tree: t, node: result}
+				return ForwardIterator[Key, Value]{tree: t, node: result}
 			}
 		} else {
 			result = node
 			if node.left != nil {
 				node = node.left
 			} else {
-				return ForwardIterator{tree: t, node: result}
+				return ForwardIterator[Key, Value]{tree: t, node: result}
 			}
 		}
 	}
@@ -168,25 +172,25 @@ func (t *TreeMap) LowerBound(key Key) ForwardIterator {
 
 // UpperBound returns an iterator pointing to the first element that is greater than the given key.
 // Complexity: O(log N).
-func (t *TreeMap) UpperBound(key Key) ForwardIterator {
+func (t *TreeMap[Key, Value]) UpperBound(key Key) ForwardIterator[Key, Value] {
 	result := t.endNode
 	node := t.endNode.left
 	if node == nil {
-		return ForwardIterator{tree: t, node: t.endNode}
+		return ForwardIterator[Key, Value]{tree: t, node: t.endNode}
 	}
 	for {
-		if !t.Less(key, node.key) {
+		if !t.keyCompare(key, node.key) {
 			if node.right != nil {
 				node = node.right
 			} else {
-				return ForwardIterator{tree: t, node: result}
+				return ForwardIterator[Key, Value]{tree: t, node: result}
 			}
 		} else {
 			result = node
 			if node.left != nil {
 				node = node.left
 			} else {
-				return ForwardIterator{tree: t, node: result}
+				return ForwardIterator[Key, Value]{tree: t, node: result}
 			}
 		}
 	}
@@ -196,27 +200,35 @@ func (t *TreeMap) UpperBound(key Key) ForwardIterator {
 // It starts at the first element and goes to the one-past-the-end position.
 // You can iterate a map at O(N) complexity.
 // Method complexity: O(1)
-func (t *TreeMap) Iterator() ForwardIterator { return ForwardIterator{tree: t, node: t.beginNode} }
+func (t *TreeMap[Key, Value]) Iterator() ForwardIterator[Key, Value] {
+	return ForwardIterator[Key, Value]{tree: t, node: t.beginNode}
+}
 
 // Reverse returns a reverse iterator for tree map.
 // It starts at the last element and goes to the one-before-the-start position.
 // You can iterate a map at O(N) complexity.
 // Method complexity: O(log N)
-func (t *TreeMap) Reverse() ReverseIterator {
+func (t *TreeMap[Key, Value]) Reverse() ReverseIterator[Key, Value] {
 	node := t.endNode.left
 	if node != nil {
 		node = mostRight(node)
 	}
-	return ReverseIterator{tree: t, node: node}
+	return ReverseIterator[Key, Value]{tree: t, node: node}
 }
 
-func (t *TreeMap) findNode(id Key) *node {
+func defaultKeyCompare[Key constraints.Ordered](
+	a, b Key,
+) bool {
+	return a < b
+}
+
+func (t *TreeMap[Key, Value]) findNode(id Key) *node[Key, Value] {
 	current := t.endNode.left
 	for current != nil {
 		switch {
-		case t.Less(id, current.key):
+		case t.keyCompare(id, current.key):
 			current = current.left
-		case t.Less(current.key, id):
+		case t.keyCompare(current.key, id):
 			current = current.right
 		default:
 			return current
@@ -225,21 +237,27 @@ func (t *TreeMap) findNode(id Key) *node {
 	return nil
 }
 
-func mostLeft(x *node) *node {
+func mostLeft[Key, Value any](
+	x *node[Key, Value],
+) *node[Key, Value] {
 	for x.left != nil {
 		x = x.left
 	}
 	return x
 }
 
-func mostRight(x *node) *node {
+func mostRight[Key, Value any](
+	x *node[Key, Value],
+) *node[Key, Value] {
 	for x.right != nil {
 		x = x.right
 	}
 	return x
 }
 
-func successor(x *node) *node {
+func successor[Key, Value any](
+	x *node[Key, Value],
+) *node[Key, Value] {
 	if x.right != nil {
 		return mostLeft(x.right)
 	}
@@ -249,7 +267,9 @@ func successor(x *node) *node {
 	return x.parent
 }
 
-func predecessor(x *node) *node {
+func predecessor[Key, Value any](
+	x *node[Key, Value],
+) *node[Key, Value] {
 	if x.left != nil {
 		return mostRight(x.left)
 	}
@@ -259,7 +279,9 @@ func predecessor(x *node) *node {
 	return x.parent
 }
 
-func rotateLeft(x *node) {
+func rotateLeft[Key, Value any](
+	x *node[Key, Value],
+) {
 	y := x.right
 	x.right = y.left
 	if x.right != nil {
@@ -275,7 +297,9 @@ func rotateLeft(x *node) {
 	x.parent = y
 }
 
-func rotateRight(x *node) {
+func rotateRight[Key, Value any](
+	x *node[Key, Value],
+) {
 	y := x.left
 	x.left = y.right
 	if x.left != nil {
@@ -291,7 +315,7 @@ func rotateRight(x *node) {
 	x.parent = y
 }
 
-func (t *TreeMap) insertFixup(x *node) {
+func (t *TreeMap[Key, Value]) insertFixup(x *node[Key, Value]) {
 	root := t.endNode.left
 	x.isBlack = x == root
 	for x != root && !x.parent.isBlack {
@@ -339,22 +363,24 @@ func (t *TreeMap) insertFixup(x *node) {
 	}
 }
 
-// nolint: gocyclo
+//nolint:gocyclo
 //noinspection GoNilness
-func removeNode(root *node, z *node) {
-	var y *node
+func removeNode[Key, Value any](
+	root, z *node[Key, Value],
+) {
+	var y *node[Key, Value]
 	if z.left == nil || z.right == nil {
 		y = z
 	} else {
 		y = successor(z)
 	}
-	var x *node
+	var x *node[Key, Value]
 	if y.left != nil {
 		x = y.left
 	} else {
 		x = y.right
 	}
-	var w *node
+	var w *node[Key, Value]
 	if x != nil {
 		x.parent = y.parent
 	}
@@ -472,18 +498,18 @@ func removeNode(root *node, z *node) {
 // ForwardIterator represents a position in a tree map.
 // It is designed to iterate a map in a forward order.
 // It can point to any position from the first element to the one-past-the-end element.
-type ForwardIterator struct {
-	tree *TreeMap
-	node *node
+type ForwardIterator[Key, Value any] struct {
+	tree *TreeMap[Key, Value]
+	node *node[Key, Value]
 }
 
-// Valid reports if an iterator's position is valid.
+// Valid reports if the iterator position is valid.
 // In other words it returns true if an iterator is not at the one-past-the-end position.
-func (i ForwardIterator) Valid() bool { return i.node != i.tree.endNode }
+func (i ForwardIterator[Key, Value]) Valid() bool { return i.node != i.tree.endNode }
 
 // Next moves an iterator to the next element.
-// It panics if goes out of bounds.
-func (i *ForwardIterator) Next() {
+// It panics if it goes out of bounds.
+func (i *ForwardIterator[Key, Value]) Next() {
 	if i.node == i.tree.endNode {
 		panic("out of bound iteration")
 	}
@@ -491,35 +517,35 @@ func (i *ForwardIterator) Next() {
 }
 
 // Prev moves an iterator to the previous element.
-// It panics if goes out of bounds.
-func (i *ForwardIterator) Prev() {
+// It panics if it goes out of bounds.
+func (i *ForwardIterator[Key, Value]) Prev() {
 	i.node = predecessor(i.node)
 	if i.node == nil {
 		panic("out of bound iteration")
 	}
 }
 
-// Key returns a key at an iterator's position
-func (i ForwardIterator) Key() Key { return i.node.key }
+// Key returns a key at the iterator position
+func (i ForwardIterator[Key, Value]) Key() Key { return i.node.key }
 
-// Value returns a value at an iterator's position
-func (i ForwardIterator) Value() Value { return i.node.value }
+// Value returns a value at the iterator position
+func (i ForwardIterator[Key, Value]) Value() Value { return i.node.value }
 
 // ReverseIterator represents a position in a tree map.
 // It is designed to iterate a map in a reverse order.
 // It can point to any position from the one-before-the-start element to the last element.
-type ReverseIterator struct {
-	tree *TreeMap
-	node *node
+type ReverseIterator[Key, Value any] struct {
+	tree *TreeMap[Key, Value]
+	node *node[Key, Value]
 }
 
-// Valid reports if an iterator's position is valid.
+// Valid reports if the iterator position is valid.
 // In other words it returns true if an iterator is not at the one-before-the-start position.
-func (i ReverseIterator) Valid() bool { return i.node != nil }
+func (i ReverseIterator[Key, Value]) Valid() bool { return i.node != nil }
 
 // Next moves an iterator to the next element in reverse order.
-// It panics if goes out of bounds.
-func (i *ReverseIterator) Next() {
+// It panics if it goes out of bounds.
+func (i *ReverseIterator[Key, Value]) Next() {
 	if i.node == nil {
 		panic("out of bound iteration")
 	}
@@ -527,8 +553,8 @@ func (i *ReverseIterator) Next() {
 }
 
 // Prev moves an iterator to the previous element in reverse order.
-// It panics if goes out of bounds.
-func (i *ReverseIterator) Prev() {
+// It panics if it goes out of bounds.
+func (i *ReverseIterator[Key, Value]) Prev() {
 	if i.node != nil {
 		i.node = successor(i.node)
 	} else {
@@ -539,8 +565,8 @@ func (i *ReverseIterator) Prev() {
 	}
 }
 
-// Key returns a key at an iterator's position
-func (i ReverseIterator) Key() Key { return i.node.key }
+// Key returns a key at the iterator position
+func (i ReverseIterator[Key, Value]) Key() Key { return i.node.key }
 
-// Value returns a value at an iterator's position
-func (i ReverseIterator) Value() Value { return i.node.value }
+// Value returns a value at the iterator position
+func (i ReverseIterator[Key, Value]) Value() Value { return i.node.value }

@@ -5,7 +5,7 @@ import (
 )
 
 func ExampleTreeMap_Set() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	v, _ := tr.Get(0)
 	fmt.Println(v)
@@ -14,7 +14,7 @@ func ExampleTreeMap_Set() {
 }
 
 func ExampleTreeMap_Del() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	tr.Del(0)
 	fmt.Println(tr.Contains(0))
@@ -23,7 +23,7 @@ func ExampleTreeMap_Del() {
 }
 
 func ExampleTreeMap_Get() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	v, _ := tr.Get(0)
 	fmt.Println(v)
@@ -32,7 +32,7 @@ func ExampleTreeMap_Get() {
 }
 
 func ExampleTreeMap_Contains() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	fmt.Println(tr.Contains(0))
 	// Output:
@@ -40,7 +40,7 @@ func ExampleTreeMap_Contains() {
 }
 
 func ExampleTreeMap_Len() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	tr.Set(1, "world")
 	fmt.Println(tr.Len())
@@ -49,7 +49,7 @@ func ExampleTreeMap_Len() {
 }
 
 func ExampleTreeMap_Clear() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(0, "hello")
 	tr.Set(1, "world")
 	tr.Clear()
@@ -59,7 +59,7 @@ func ExampleTreeMap_Clear() {
 }
 
 func ExampleTreeMap_Iterator() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(1, "one")
 	tr.Set(2, "two")
 	tr.Set(3, "three")
@@ -73,7 +73,7 @@ func ExampleTreeMap_Iterator() {
 }
 
 func ExampleTreeMap_Reverse() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(1, "one")
 	tr.Set(2, "two")
 	tr.Set(3, "three")
@@ -87,7 +87,7 @@ func ExampleTreeMap_Reverse() {
 }
 
 func ExampleTreeMap_Range() {
-	tr := New(less)
+	tr := New[int, string]()
 	tr.Set(1, "one")
 	tr.Set(2, "two")
 	tr.Set(3, "three")
