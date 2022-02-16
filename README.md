@@ -8,7 +8,7 @@ TreeMap v2
 [![GoReportCard](https://goreportcard.com/badge/github.com/igrmk/treemap/v2)](https://goreportcard.com/report/github.com/igrmk/treemap/v2)
 
 `TreeMap` is a generic key-sorted map.
-It uses red-black tree under the hood.
+It uses a red-black tree under the hood.
 It requires and relies on [Go 1.18](https://tip.golang.org/doc/go1.18) generics feature.
 Iterators are designed after C++.
 
