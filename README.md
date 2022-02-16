@@ -6,11 +6,12 @@ TreeMap v2
 [![Build Status](https://api.travis-ci.com/igrmk/treemap.svg?branch=master)](https://app.travis-ci.com/github/igrmk/treemap)
 [![Coverage Status](https://coveralls.io/repos/igrmk/treemap/badge.svg?branch=master)](https://coveralls.io/github/igrmk/treemap)
 [![GoReportCard](https://goreportcard.com/badge/github.com/igrmk/treemap/v2)](https://goreportcard.com/report/github.com/igrmk/treemap/v2)
+[![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-`TreeMap` is a generic key-sorted map.
-It uses a red-black tree under the hood.
+`TreeMap` is a generic key-sorted map using a red-black tree under the hood.
 It requires and relies on [Go 1.18](https://tip.golang.org/doc/go1.18) generics feature.
 Iterators are designed after C++.
+Please note that [go report](https://goreportcard.com) does not support generics yet so it gives D mark due to an unknown syntax.
 
 ### Usage
 
