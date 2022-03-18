@@ -26,7 +26,7 @@
 //     // 1 World
 package treemap
 
-import "constraints"
+import "golang.org/x/exp/constraints"
 
 // TreeMap is the generic red-black tree based map
 type TreeMap[Key, Value any] struct {
