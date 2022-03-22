@@ -11,7 +11,6 @@ TreeMap v2
 `TreeMap` is a generic key-sorted map using a red-black tree under the hood.
 It requires and relies on [Go 1.18](https://tip.golang.org/doc/go1.18) generics feature.
 Iterators are designed after C++.
-Please note that [go report](https://goreportcard.com) does not support generics yet so it gives D mark due to an unknown syntax.
 
 ### Usage
 
